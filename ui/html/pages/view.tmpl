@@ -1,0 +1,19 @@
+{{define "title"}}Post #{{.Post.ID}}{{end}}
+
+{{define "main"}}
+    {{with .Post}}
+    <div class='Post'>
+        <div class='metadata'>
+            <strong>{{.Title}}</strong>
+            <span>#{{.ID}}</span>
+        </div>
+       {{len nil}} <!-- Deliberate error -->
+        <pre><code>{{.Post.Content}}</code></pre>
+        <div class='metadata'>
+            <time>Created: {{.Post.Created}}</time>
+            <time>Expires: {{.Post.Expires}}</time>
+        </div>
+    </div>
+    {{end}}
+{{end}}
+
