@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"forum/internal/models"
 	"net/http"
 )
 
@@ -15,7 +14,7 @@ func (h *HandlerApp) Home(w http.ResponseWriter, r *http.Request) {
 		h.ServerError(w, err)
 		return
 	}
-	h.Render(w, http.StatusOK, "home.tmpl", &models.TemplateData{
-		Posts: posts,
-	})
+	data := h.NewTemplateData(r)
+	data.Posts = posts
+	h.Render(w, http.StatusOK, "home.tmpl", data)
 }

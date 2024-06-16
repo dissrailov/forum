@@ -1,11 +1,13 @@
 package app
 
 import (
+	"bytes"
 	"fmt"
 	"forum/internal/models"
 	"net/http"
 	"path/filepath"
 	"text/template"
+	"time"
 )
 
 func NewTemplateCache() (map[string]*template.Template, error) {
@@ -19,25 +21,21 @@ func NewTemplateCache() (map[string]*template.Template, error) {
 	for _, page := range pages {
 		name := filepath.Base(page)
 
-		// Parse the base template file into a template set.
-		ts, err := template.ParseFiles("./ui/html/base.tmpl")
+		ts, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.tmpl")
 		if err != nil {
 			return nil, err
 		}
 
-		// Call ParseGlob() *on this template set* to add any partials.
 		ts, err = ts.ParseGlob("./ui/html/partials/*.tmpl")
 		if err != nil {
 			return nil, err
 		}
 
-		// Call ParseFiles() *on this template set* to add the  page template.
 		ts, err = ts.ParseFiles(page)
 		if err != nil {
 			return nil, err
 		}
 
-		// Add the template set to the map as normal...
 		cache[name] = ts
 	}
 
@@ -51,9 +49,22 @@ func (app *Application) Render(w http.ResponseWriter, status int, page string, d
 		app.ServerError(w, err)
 		return
 	}
-	w.WriteHeader(status)
-	err := ts.ExecuteTemplate(w, "base", data)
+
+	buf := new(bytes.Buffer)
+
+	err := ts.ExecuteTemplate(buf, "base", data)
 	if err != nil {
 		app.ServerError(w, err)
+		return
 	}
+	w.WriteHeader(status)
+	buf.WriteTo(w)
+}
+
+func humanDate(t time.Time) string {
+	return t.Local().Format("02 Jan 2006 at 15:04")
+}
+
+var functions = template.FuncMap{
+	"humanDate": humanDate,
 }

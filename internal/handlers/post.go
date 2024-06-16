@@ -44,7 +44,9 @@ func (h *HandlerApp) postView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.Render(w, http.StatusOK, "view.tmpl", &models.TemplateData{
-		Post: post,
-	})
+	data := h.NewTemplateData(r)
+	data.Post = post
+
+	h.Render(w, http.StatusOK, "view.tmpl", data)
+
 }

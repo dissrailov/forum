@@ -2,18 +2,16 @@
 
 {{define "main"}}
     {{with .Post}}
-    <div class='Post'>
+    <div class='snippet'>
         <div class='metadata'>
             <strong>{{.Title}}</strong>
             <span>#{{.ID}}</span>
         </div>
-       {{len nil}} <!-- Deliberate error -->
-        <pre><code>{{.Post.Content}}</code></pre>
+        <pre><code>{{.Content}}</code></pre>
         <div class='metadata'>
-            <time>Created: {{.Post.Created}}</time>
-            <time>Expires: {{.Post.Expires}}</time>
+            <time>Created: {{humanDate .Created}}</time>
+            <time>Expires: {{humanDate .Expires}}</time>
         </div>
     </div>
     {{end}}
 {{end}}
-
