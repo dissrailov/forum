@@ -33,21 +33,28 @@ func (h *HandlerApp) postCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fielderrors := make(map[string]string)
+	form := models.PostCreateForm{
+		Title:       r.PostForm.Get("title"),
+		Content:     r.PostForm.Get("content"),
+		Expires:     expires,
+		FieldErrors: map[string]string{},
+	}
 
 	if strings.TrimSpace(title) == "" {
-		fielderrors["title"] = "this field cannot be blank"
+		form.FieldErrors["title"] = "this field cannot be blank"
 	} else if utf8.RuneCountInString(title) > 100 {
-		fielderrors["title"] = "this field cannot be more than 100 characters long"
+		form.FieldErrors["title"] = "this field cannot be more than 100 characters long"
 	}
 	if strings.TrimSpace(content) == "" {
-		fielderrors["content"] = "this field cannot be blank"
+		form.FieldErrors["content"] = "this field cannot be blank"
 	}
 	if expires != 1 && expires != 7 && expires != 365 {
-		fielderrors["expires"] = "This field must equal 1, 7 or 365"
+		form.FieldErrors["expires"] = "This field must equal 1, 7 or 365"
 	}
-	if len(fielderrors) > 0 {
-		fmt.Fprint(w, fielderrors)
+	if len(form.FieldErrors) > 0 {
+		data := h.NewTemplateData(r)
+		data.Form = form
+		h.Render(w, http.StatusUnprocessableEntity, "create.tmpl", data)
 		return
 	}
 
@@ -61,6 +68,9 @@ func (h *HandlerApp) postCreatePost(w http.ResponseWriter, r *http.Request) {
 
 func (h *HandlerApp) postCreateGet(w http.ResponseWriter, r *http.Request) {
 	data := h.NewTemplateData(r)
+	data.Form = models.PostCreateForm{
+		Expires: 365,
+	}
 	h.Render(w, http.StatusOK, "create.tmpl", data)
 }
 

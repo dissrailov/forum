@@ -10,4 +10,9 @@ type Post struct {
 	Expires time.Time
 }
 
-// TODO: realization post
+type PostCreateForm struct {
+	Title       string
+	Content     string
+	Expires     int
+	FieldErrors map[string]string
+}
