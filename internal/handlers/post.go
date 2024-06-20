@@ -9,22 +9,38 @@ import (
 )
 
 func (h *HandlerApp) postCreate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		w.Header().Set("Allow", http.MethodPost)
-		h.ClientError(w, http.StatusMethodNotAllowed)
+	if r.URL.Path != "/post/create" {
+		h.NotFound(w)
 		return
 	}
+	h.methodResolver(w, r, h.postCreateGet, h.postCreatePost)
+}
 
-	title := "O snail"
-	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi Issa"
-	expires := 7
+func (h *HandlerApp) postCreatePost(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		h.ClientError(w, http.StatusBadRequest)
+		return
+	}
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
 
+	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
+	if err != nil {
+		h.ClientError(w, http.StatusBadRequest)
+		return
+	}
 	id, err := h.service.CreatePost(title, content, expires)
 	if err != nil {
 		h.ServerError(w, err)
 		return
 	}
 	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", id), http.StatusSeeOther)
+}
+
+func (h *HandlerApp) postCreateGet(w http.ResponseWriter, r *http.Request) {
+	data := h.NewTemplateData(r)
+	h.Render(w, http.StatusOK, "create.tmpl", data)
 }
 
 func (h *HandlerApp) postView(w http.ResponseWriter, r *http.Request) {
