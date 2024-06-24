@@ -11,6 +11,11 @@ type service struct {
 
 type ServiceI interface {
 	PostServiceI
+	UserServiceI
+}
+
+type UserServiceI interface {
+	
 }
 
 func NewService(repo repo.RepoI) ServiceI {
