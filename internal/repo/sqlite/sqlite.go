@@ -20,16 +20,30 @@ func NewDB(dsn string) (*Sqlite, error) {
 		db.Close()
 		return nil, err
 	}
-	queries := `CREATE TABLE IF NOT EXISTS posts (
+	queries := []string{
+		`CREATE TABLE IF NOT EXISTS posts (
 		id INTEGER PRIMARY KEY,
 		title TEXT NOT NULL,
 		content TEXT NOT NULL,
 		created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		expires TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	);`
-	_, err = db.Exec(queries)
-	if err != nil {
-		fmt.Print(err)
+	);`,
+		`CREATE TABLE IF NOT EXISTS sessions (
+		data BLOB NOT NULL,
+		token INTEGER PRIMARY KEY,
+		expiry TIMESTAMP NOT NULL
+	);`,
+	}
+	for _, query := range queries {
+		stmt, err := db.Prepare(query)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", "storage.sqlite.New", err)
+		}
+		_, err = stmt.Exec()
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", "storage.sqlite.New", err)
+		}
+		stmt.Close()
 	}
 	return &Sqlite{DB: db}, nil
 }
