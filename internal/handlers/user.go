@@ -73,11 +73,45 @@ func (h *HandlerApp) userLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerApp) userLoginPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Authenticate and login the user...")
+	form := models.UserLoginForm{
+		Email:    strings.ToLower(r.FormValue("email")),
+		Password: r.FormValue("password"),
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		h.ClientError(w, http.StatusBadRequest)
+		return
+	}
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+
+	if !form.Valid() {
+		data := h.NewTemplateData(r)
+		data.Form = form
+		h.Render(w, http.StatusUnprocessableEntity, "login.tmpl", data)
+		return
+	}
+	_, err = h.service.Authenticate(form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrInvalidCredentials) {
+			form.AddNonFieldErrors("Email or password incorrect")
+			data := h.NewTemplateData(r)
+			data.Form = form
+			h.Render(w, http.StatusUnprocessableEntity, "login.tmpl", data)
+		} else {
+			h.ServerError(w, err)
+		}
+		return
+	}
+	http.Redirect(w, r, "/post/create", http.StatusSeeOther)
 }
 
 func (h *HandlerApp) userLoginGet(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Display a HTML form for logging in a user...")
+	data := h.NewTemplateData(r)
+	data.Form = models.UserLoginForm{}
+	h.Render(w, http.StatusOK, "login.tmpl", data)
 }
 
 func (h *HandlerApp) userLogoutPost(w http.ResponseWriter, r *http.Request) {

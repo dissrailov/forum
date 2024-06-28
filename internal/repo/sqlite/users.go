@@ -1,6 +1,8 @@
 package sqlite
 
 import (
+	"database/sql"
+	"errors"
 	"forum/internal/models"
 	"strings"
 
@@ -29,8 +31,29 @@ func (s *Sqlite) CreateUser(name, email, password string) error {
 	return nil
 }
 
-func (m *Sqlite) Authenticate(email, password string) (int, error) {
-	return 0, nil
+func (s *Sqlite) Authenticate(email, password string) (int, error) {
+	var id int
+	var hashedPassword []byte
+
+	stmt := `SELECT id, hashed_password FROM users WHERE email = ?`
+
+	err := s.DB.QueryRow(stmt, email).Scan(&id, &hashedPassword)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, models.ErrInvalidCredentials
+		} else {
+			return 0, err
+		}
+	}
+	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
+	if err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return 0, models.ErrInvalidCredentials
+		} else {
+			return 0, err
+		}
+	}
+	return id, nil
 }
 
 func (m *Sqlite) Exists(id int) (bool, error) {
