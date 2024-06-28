@@ -11,6 +11,7 @@ type service struct {
 
 type ServiceI interface {
 	PostServiceI
+	UserServiceI
 }
 
 func NewService(repo repo.RepoI) ServiceI {
@@ -21,4 +22,8 @@ type PostServiceI interface {
 	CreatePost(title string, content string, expires int) (int, error)
 	GetPostId(id int) (*models.Post, error)
 	GetLastPost() (*[]models.Post, error)
+}
+
+type UserServiceI interface {
+	CreateUser(name, email, password string) error
 }

@@ -33,6 +33,13 @@ func NewDB(dsn string) (*Sqlite, error) {
 		token INTEGER PRIMARY KEY,
 		expiry TIMESTAMP NOT NULL
 	);`,
+		`CREATE TABLE IF NOT EXISTS users (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+  		name TEXT NOT NULL,
+    	email TEXT NOT NULL,
+    	hashed_password CHAR(60) NOT NULL,
+    	created DATETIME NOT NULL
+	);`,
 	}
 	for _, query := range queries {
 		stmt, err := db.Prepare(query)
