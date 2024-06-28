@@ -20,6 +20,7 @@ func NewDB(dsn string) (*Sqlite, error) {
 		db.Close()
 		return nil, err
 	}
+
 	queries := []string{
 		`CREATE TABLE IF NOT EXISTS posts (
 		id INTEGER PRIMARY KEY,
@@ -38,7 +39,8 @@ func NewDB(dsn string) (*Sqlite, error) {
   		name TEXT NOT NULL,
     	email TEXT NOT NULL,
     	hashed_password CHAR(60) NOT NULL,
-    	created DATETIME NOT NULL
+    	created DATETIME NOT NULL,
+    	UNIQUE(email)
 	);`,
 	}
 	for _, query := range queries {

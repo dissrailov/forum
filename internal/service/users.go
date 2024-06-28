@@ -1,7 +1,8 @@
 package service
 
 func (s *service) CreateUser(name, email, password string) error {
-	return s.repo.CreateUser(name, email, password)
+	err := s.repo.CreateUser(name, email, password)
+	return err
 }
 
 func (s *service) Exists(id int) (bool, error) {
