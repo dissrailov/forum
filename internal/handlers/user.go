@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"errors"
-	"fmt"
 	"forum/internal/models"
+	"forum/internal/pkg/cookie"
 	"forum/internal/pkg/validator"
 	"net/http"
 	"strings"
@@ -83,6 +83,7 @@ func (h *HandlerApp) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
+
 	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
 	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
 	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
@@ -93,7 +94,8 @@ func (h *HandlerApp) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		h.Render(w, http.StatusUnprocessableEntity, "login.tmpl", data)
 		return
 	}
-	_, err = h.service.Authenticate(form.Email, form.Password)
+
+	session, err := h.service.Authenticate(form.Email, form.Password)
 	if err != nil {
 		if errors.Is(err, models.ErrInvalidCredentials) {
 			form.AddNonFieldErrors("Email or password incorrect")
@@ -105,9 +107,9 @@ func (h *HandlerApp) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	cookie.SetSessionCookie("session_id", w, session.Token, session.ExpTime)
 	http.Redirect(w, r, "/post/create", http.StatusSeeOther)
 }
-
 func (h *HandlerApp) userLoginGet(w http.ResponseWriter, r *http.Request) {
 	data := h.NewTemplateData(r)
 	data.Form = models.UserLoginForm{}
@@ -115,5 +117,11 @@ func (h *HandlerApp) userLoginGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerApp) userLogoutPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Logout the user...")
+	c := cookie.GetSessionCookie("session_id", r)
+	if c != nil {
+		h.service.DeleteSession(c.Value)
+		cookie.ExpireSessionCookie("session_id", w)
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+
 }

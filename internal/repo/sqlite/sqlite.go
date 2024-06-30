@@ -15,7 +15,6 @@ func NewDB(dsn string) (*Sqlite, error) {
 		return nil, err
 	}
 
-	// Проверим соединение с базой данных
 	if err := db.Ping(); err != nil {
 		db.Close()
 		return nil, err
@@ -23,17 +22,18 @@ func NewDB(dsn string) (*Sqlite, error) {
 
 	queries := []string{
 		`CREATE TABLE IF NOT EXISTS posts (
-		id INTEGER PRIMARY KEY,
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		title TEXT NOT NULL,
 		content TEXT NOT NULL,
 		created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		expires TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);`,
 		`CREATE TABLE IF NOT EXISTS sessions (
-		data BLOB NOT NULL,
-		token INTEGER PRIMARY KEY,
-		expiry TIMESTAMP NOT NULL
-	);`,
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER,
+			token TEXT NOT NULL,
+			exp_time TIMESTAMP NOT NULL
+		);`,
 		`CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
   		name TEXT NOT NULL,
@@ -46,11 +46,11 @@ func NewDB(dsn string) (*Sqlite, error) {
 	for _, query := range queries {
 		stmt, err := db.Prepare(query)
 		if err != nil {
-			return nil, fmt.Errorf("%s: %w", "storage.sqlite.New", err)
+			return nil, fmt.Errorf("%s: %w", "sqlite.NewDB", err)
 		}
 		_, err = stmt.Exec()
 		if err != nil {
-			return nil, fmt.Errorf("%s: %w", "storage.sqlite.New", err)
+			return nil, fmt.Errorf("%s: %w", "sqlite.NewDB", err)
 		}
 		stmt.Close()
 	}

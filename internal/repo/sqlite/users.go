@@ -3,6 +3,7 @@ package sqlite
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"forum/internal/models"
 	"strings"
 
@@ -15,7 +16,6 @@ func (s *Sqlite) CreateUser(name, email, password string) error {
 	if err != nil {
 		return err
 	}
-
 	stmt := `INSERT INTO users (name, email, hashed_password, created)
 	         VALUES(?, ?, ?, datetime('now'));`
 	_, err = s.DB.Exec(stmt, name, email, string(hashedPassword))
@@ -54,6 +54,20 @@ func (s *Sqlite) Authenticate(email, password string) (int, error) {
 		}
 	}
 	return id, nil
+}
+
+func (s *Sqlite) GetUserByID(id int) (*models.User, error) {
+	op := "sqlite.GetUserByID"
+	var u models.User
+	stmt := `SELECT id, name, email, created FROM users WHERE id=?`
+	err := s.DB.QueryRow(stmt, id).Scan(&u.ID, &u.Name, &u.Email, &u.Created)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, models.ErrNoRecord
+		}
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+	return &u, nil
 }
 
 func (m *Sqlite) Exists(id int) (bool, error) {

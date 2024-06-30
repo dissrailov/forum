@@ -26,5 +26,6 @@ type PostServiceI interface {
 
 type UserServiceI interface {
 	CreateUser(name, email, password string) error
-	Authenticate(email, password string) (int, error)
+	Authenticate(email, password string) (*models.Session, error)
+	DeleteSession(token string) error
 }

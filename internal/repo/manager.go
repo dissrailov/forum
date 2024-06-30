@@ -12,6 +12,7 @@ func NewRepo(dsn string) (RepoI, error) {
 type RepoI interface {
 	PostRepo
 	UserRepo
+	SessionRepo
 }
 
 type PostRepo interface {
@@ -24,4 +25,10 @@ type UserRepo interface {
 	CreateUser(name, email, password string) error
 	Authenticate(email, password string) (int, error)
 	Exists(id int) (bool, error)
+}
+
+type SessionRepo interface {
+	CreateSession(session *models.Session) error
+	DeleteSessionById(userid int) error
+	DeleteSessionByToken(token string) error
 }

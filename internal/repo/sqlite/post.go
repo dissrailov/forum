@@ -11,7 +11,7 @@ func (s *Sqlite) CreatePost(title string, content string, expires int) (int, err
 	VALUES (?, ?, datetime('now'), datetime('now', '+' || ? || ' day'))`
 	result, err := s.DB.Exec(stmt, title, content, expires)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 	id, err := result.LastInsertId()
 	if err != nil {
