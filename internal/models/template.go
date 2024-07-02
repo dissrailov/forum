@@ -6,4 +6,5 @@ type TemplateData struct {
 	CurrentYear     int
 	Form            any
 	IsAuthenticated bool
+	User            *User
 }

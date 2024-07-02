@@ -3,6 +3,7 @@ package service
 import (
 	"forum/internal/models"
 	"forum/internal/repo"
+	"net/http"
 )
 
 type service struct {
@@ -28,4 +29,5 @@ type UserServiceI interface {
 	CreateUser(name, email, password string) error
 	Authenticate(email, password string) (*models.Session, error)
 	DeleteSession(token string) error
+	GetUser(r *http.Request) (*models.User, error)
 }

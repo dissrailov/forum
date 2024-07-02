@@ -32,3 +32,16 @@ func (s *Sqlite) DeleteSessionByToken(token string) error {
 	}
 	return nil
 }
+
+func (s *Sqlite) GetUserIDByToken(token string) (int, error) {
+	op := "sqlite.GetUserIDByToken"
+	stmt := `SELECT user_id FROM sessions WHERE token = ?`
+	var userID int
+
+	err := s.DB.QueryRow(stmt, token).Scan(&userID)
+	if err != nil {
+		return -1, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return userID, nil
+}

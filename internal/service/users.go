@@ -2,6 +2,8 @@ package service
 
 import (
 	"forum/internal/models"
+	"forum/internal/pkg/cookie"
+	"net/http"
 )
 
 func (s *service) CreateUser(name, email, password string) error {
@@ -35,4 +37,13 @@ func (s *service) Authenticate(email, password string) (*models.Session, error) 
 		return nil, err
 	}
 	return session, nil
+}
+
+func (s *service) GetUser(r *http.Request) (*models.User, error) {
+	token := cookie.GetSessionCookie("session_id", r)
+	userID, err := s.repo.GetUserIDByToken(token.Value)
+	if err != nil {
+		return nil, err
+	}
+	return s.repo.GetUserByID(userID)
 }
