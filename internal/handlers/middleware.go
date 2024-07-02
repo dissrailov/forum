@@ -65,20 +65,14 @@ func (h *HandlerApp) IsAuthenticated(r *http.Request) bool {
 	return cookie != nil && cookie.Value != ""
 }
 
-// func (h *HandlerApp) requireAuthentication(next http.HandlerFunc) http.HandlerFunc {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		// If the user is not authenticated, redirect them to the login page and
-// 		// return from the middleware chain so that no subsequent handlers in
-// 		// the chain are executed.
-// 		c := cookie.GetSessionCookie("sesion_id", r)
-// 		if c == nil {
-// 			http.Redirect(w, r, "/user/login", http.StatusSeeOther)
-// 			return
-// 		}
+func (h *HandlerApp) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !h.IsAuthenticated(r) {
+			http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+			return
+		}
+		w.Header().Add("Cache-Control", "no-store")
+		next.ServeHTTP(w, r)
+	})
+}
 
-// 		w.Header().Add("Cache-Control", "no-store")
-
-// 		// And call the next handler in the chain.
-// 		next.ServeHTTP(w, r)
-// 	})
-// }

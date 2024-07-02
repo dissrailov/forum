@@ -71,5 +71,8 @@ func (s *Sqlite) GetUserByID(id int) (*models.User, error) {
 }
 
 func (m *Sqlite) Exists(id int) (bool, error) {
-	return false, nil
+	var exists bool
+	stmt := `SELECT EXISTS(SELECT 1 FROM users WHERE id = ?);`
+	err := m.DB.QueryRow(stmt, id).Scan(&exists)
+	return exists, err
 }
