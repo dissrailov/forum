@@ -2,7 +2,10 @@ package handlers
 
 import (
 	"fmt"
+	"forum/internal/models"
+	"forum/internal/pkg/cookie"
 	"net/http"
+	"time"
 )
 
 func SecureHeaders(next http.Handler) http.Handler {
@@ -15,18 +18,17 @@ func SecureHeaders(next http.Handler) http.Handler {
 		w.Header().Set("X-Frame-Options", "deny")
 		w.Header().Set("X-XSS-Protection", "0")
 		next.ServeHTTP(w, r)
-
 	})
 }
 
-func (h HandlerApp) Logrequest(next http.Handler) http.Handler {
+func (h *HandlerApp) Logrequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.InfoLog.Printf("%s - %s %s %s", r.RemoteAddr, r.Proto, r.Method, r.URL.RequestURI())
 		next.ServeHTTP(w, r)
 	})
 }
 
-func (h HandlerApp) recoverPanic(next http.Handler) http.Handler {
+func (h *HandlerApp) recoverPanic(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
@@ -38,7 +40,7 @@ func (h HandlerApp) recoverPanic(next http.Handler) http.Handler {
 	})
 }
 
-func (h HandlerApp) methodResolver(w http.ResponseWriter, r *http.Request, get, post func(w http.ResponseWriter, r *http.Request)) {
+func (h *HandlerApp) methodResolver(w http.ResponseWriter, r *http.Request, get, post func(w http.ResponseWriter, r *http.Request)) {
 	switch r.Method {
 	case http.MethodGet:
 		get(w, r)
@@ -50,3 +52,33 @@ func (h HandlerApp) methodResolver(w http.ResponseWriter, r *http.Request, get, 
 		return
 	}
 }
+
+func (h *HandlerApp) NewTemplateData(r *http.Request) *models.TemplateData {
+	return &models.TemplateData{
+		CurrentYear:     time.Now().Year(),
+		IsAuthenticated: h.IsAuthenticated(r),
+	}
+}
+
+func (h *HandlerApp) IsAuthenticated(r *http.Request) bool {
+	cookie := cookie.GetSessionCookie("session_id", r)
+	return cookie != nil && cookie.Value != ""
+}
+
+// func (h *HandlerApp) requireAuthentication(next http.HandlerFunc) http.HandlerFunc {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		// If the user is not authenticated, redirect them to the login page and
+// 		// return from the middleware chain so that no subsequent handlers in
+// 		// the chain are executed.
+// 		c := cookie.GetSessionCookie("sesion_id", r)
+// 		if c == nil {
+// 			http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+// 			return
+// 		}
+
+// 		w.Header().Add("Cache-Control", "no-store")
+
+// 		// And call the next handler in the chain.
+// 		next.ServeHTTP(w, r)
+// 	})
+// }

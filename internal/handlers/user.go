@@ -24,7 +24,6 @@ func (h *HandlerApp) UserSignupPost(w http.ResponseWriter, r *http.Request) {
 		Password: r.FormValue("password"),
 	}
 	err := r.ParseForm()
-
 	if err != nil {
 		h.ClientError(w, http.StatusBadRequest)
 		return
@@ -107,9 +106,11 @@ func (h *HandlerApp) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	
 	cookie.SetSessionCookie("session_id", w, session.Token, session.ExpTime)
-	http.Redirect(w, r, "/post/create", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
 func (h *HandlerApp) userLoginGet(w http.ResponseWriter, r *http.Request) {
 	data := h.NewTemplateData(r)
 	data.Form = models.UserLoginForm{}
@@ -123,5 +124,6 @@ func (h *HandlerApp) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 		cookie.ExpireSessionCookie("session_id", w)
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-
 }
+
+

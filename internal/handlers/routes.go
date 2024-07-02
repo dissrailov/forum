@@ -12,9 +12,9 @@ func (h *HandlerApp) Routes() http.Handler {
 	mux.HandleFunc("/post/view", h.postView)
 	mux.HandleFunc("/post/create", h.postCreate)
 
-	//users
+	// users
 	mux.HandleFunc("/user/signup", h.UserSignup)
-	mux.HandleFunc("/user/login", h.userLogin)
+	mux.HandleFunc("/user/login", (h.userLogin))
 	mux.HandleFunc("/user/logout", h.userLogoutPost)
 
 	return h.recoverPanic(h.Logrequest(SecureHeaders(mux)))

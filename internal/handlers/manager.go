@@ -7,12 +7,12 @@ import (
 
 type HandlerApp struct {
 	service service.ServiceI
-	app.Application
+	*app.Application
 }
 
-func New(s service.ServiceI, h app.Application) *HandlerApp {
+func New(s service.ServiceI, a *app.Application) *HandlerApp {
 	return &HandlerApp{
 		s,
-		h,
+		a,
 	}
 }

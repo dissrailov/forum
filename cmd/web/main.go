@@ -26,7 +26,7 @@ func main() {
 	}
 	service := service.NewService(db)
 	app := app.New(infolog, errorlog, templateCache)
-	handlers := handlers.New(service, *app)
+	handlers := handlers.New(service, app)
 	// handlerapp := &handlers.HandlerApp{}
 	infolog.Println("Server is running on :http://localhost:8080")
 	srv := &http.Server{
