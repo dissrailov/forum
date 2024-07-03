@@ -19,6 +19,10 @@ type PostRepo interface {
 	CreatePost(title string, content string, expires int) (int, error)
 	GetPostId(id int) (*models.Post, error)
 	GetLastPost() (*[]models.Post, error)
+	LikePost(userID, postID int) error
+	DislikePost(userID, postID int) error
+	GetUserReaction(userID, postID int) (int, error)
+	RemoveReaction(userID, postID int) error
 }
 
 type UserRepo interface {

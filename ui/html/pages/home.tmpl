@@ -8,12 +8,28 @@
             <th>Title</th>
             <th>Created</th>
             <th>ID</th>
+            <th>Likes</th>
+            <th>Dislikes</th>
         </tr>
         {{range .Posts}}
         <tr>
             <td><a href='/post/view?id={{.ID}}'>{{.Title}}</a></td>
             <td>{{humanDate .Created}}</td>
             <td>#{{.ID}}</td>
+            <td>
+                <form action="/post/like" method="post">
+                    <input type="hidden" name="postID" value="{{.ID}}">
+                    <button type="submit">Like</button>
+                    <span>{{.Likes}}</span>
+                </form>
+            </td>
+            <td>
+                <form action="/post/dislike" method="post">
+                    <input type="hidden" name="postID" value="{{.ID}}">
+                    <button type="submit">Dislike</button>
+                    <span>{{.Dislikes}}</span>
+                </form>
+            </td>
         </tr>
         {{end}}
     </table>

@@ -37,7 +37,7 @@ WHERE expires > DATETIME('now') AND id = ?`
 }
 
 func (s *Sqlite) GetLastPost() (*[]models.Post, error) {
-	stmt := `SELECT id, title, content, created, expires FROM posts
+	stmt := `SELECT id, title, content, likes, dislikes, created, expires FROM posts
 	WHERE expires > datetime('now') ORDER BY id DESC LIMIT 10`
 	rows, err := s.DB.Query(stmt)
 	if err != nil {
@@ -48,7 +48,7 @@ func (s *Sqlite) GetLastPost() (*[]models.Post, error) {
 	var posts []models.Post
 	for rows.Next() {
 		var p models.Post
-		err = rows.Scan(&p.ID, &p.Title, &p.Content, &p.Created, &p.Expires)
+		err = rows.Scan(&p.ID, &p.Title, &p.Content, &p.Likes, &p.Dislikes, &p.Created, &p.Expires)
 		if err != nil {
 			return nil, err
 		}

@@ -20,3 +20,11 @@ func (s *service) GetLastPost() (*[]models.Post, error) {
 	}
 	return post, nil
 }
+
+func (s *service) DislikePost(userID, postID int) error {
+	return s.repo.DislikePost(userID, postID)
+}
+
+func (s *service) LikePost(userID, postID int) error {
+	return s.repo.LikePost(userID, postID)
+}

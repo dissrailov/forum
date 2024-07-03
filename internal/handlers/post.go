@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"forum/internal/models"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -96,4 +98,90 @@ func (h *HandlerApp) postView(w http.ResponseWriter, r *http.Request) {
 
 	h.Render(w, http.StatusOK, "view.tmpl", data)
 
+}
+
+func (h *HandlerApp) LikePost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	postIDStr := r.FormValue("postID")
+	postID, err := strconv.Atoi(postIDStr)
+	if err != nil || postID < 1 {
+		log.Println(err)
+		h.NotFound(w)
+		return
+	}
+
+	userID, _ := h.service.GetUser(r) // Функция для получения идентификатора текущего пользователя
+
+	reaction, err := h.service.GetUserReaction(userID.ID, postID)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		h.ServerError(w, err)
+		return
+	}
+
+	if reaction == 1 {
+		if err := h.service.RemoveReaction(userID.ID, postID); err != nil {
+			h.ServerError(w, err)
+			return
+		}
+	} else {
+		if reaction == -1 {
+			if err := h.service.RemoveReaction(userID.ID, postID); err != nil {
+				h.ServerError(w, err)
+				return
+			}
+		}
+		if err := h.service.LikePost(userID.ID, postID); err != nil {
+			http.Error(w, "Failed to like post", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (h *HandlerApp) DislikePost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	postIDStr := r.FormValue("postID")
+	postID, err := strconv.Atoi(postIDStr)
+	if err != nil || postID < 1 {
+		log.Println(err)
+		h.NotFound(w)
+		return
+	}
+
+	userID, _ := h.service.GetUser(r) // Функция для получения идентификатора текущего пользователя
+
+	reaction, err := h.service.GetUserReaction(userID.ID, postID)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		h.ServerError(w, err)
+		return
+	}
+
+	if reaction == -1 {
+		if err := h.service.RemoveReaction(userID.ID, postID); err != nil {
+			h.ServerError(w, err)
+			return
+		}
+	} else {
+		if reaction == 1 {
+			if err := h.service.RemoveReaction(userID.ID, postID); err != nil {
+				h.ServerError(w, err)
+				return
+			}
+		}
+		if err := h.service.DislikePost(userID.ID, postID); err != nil {
+			http.Error(w, "Failed to dislike post", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

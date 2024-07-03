@@ -55,3 +55,10 @@ func (s *service) GetPassword(userId int) (string, error) {
 func (s *service) UpdatePassword(userID int, hashedPassword string) error {
 	return s.repo.UpdatePassword(userID, hashedPassword)
 }
+func (s *service) GetUserReaction(userID, postID int) (int, error) {
+	return s.repo.GetUserReaction(userID, postID)
+}
+
+func (s *service) RemoveReaction(userID, postID int) error {
+	return s.repo.RemoveReaction(userID, postID)
+}
