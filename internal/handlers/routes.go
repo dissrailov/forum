@@ -19,6 +19,7 @@ func (h *HandlerApp) Routes() http.Handler {
 	mux.HandleFunc("/user/logout", h.userLogoutPost)
 	//account
 	mux.HandleFunc("/account/view", h.RequireAuth(h.AccountView))
+	mux.HandleFunc("/account/password", h.RequireAuth(h.AccountChangePassword))
 
 	return h.recoverPanic(h.Logrequest(SecureHeaders(mux)))
 }
