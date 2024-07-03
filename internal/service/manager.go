@@ -30,4 +30,6 @@ type UserServiceI interface {
 	Authenticate(email, password string) (*models.Session, error)
 	DeleteSession(token string) error
 	GetUser(r *http.Request) (*models.User, error)
+	GetPassword(userId int) (string, error)
+	UpdatePassword(userID int, hashedPassword string) error
 }

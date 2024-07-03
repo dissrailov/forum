@@ -47,3 +47,11 @@ func (s *service) GetUser(r *http.Request) (*models.User, error) {
 	}
 	return s.repo.GetUserByID(userID)
 }
+
+func (s *service) GetPassword(userId int) (string, error) {
+	return s.repo.GetPassword(userId)
+}
+
+func (s *service) UpdatePassword(userID int, hashedPassword string) error {
+	return s.repo.UpdatePassword(userID, hashedPassword)
+}

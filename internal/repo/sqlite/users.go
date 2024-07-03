@@ -76,3 +76,25 @@ func (m *Sqlite) Exists(id int) (bool, error) {
 	err := m.DB.QueryRow(stmt, id).Scan(&exists)
 	return exists, err
 }
+
+func (m *Sqlite) GetPassword(userId int) (string, error) {
+	var hashedPassword string
+
+	err := m.DB.QueryRow("SELECT hashed_password FROM users WHERE id = ?", userId).Scan(&hashedPassword)
+	if err != nil {
+		return "", fmt.Errorf("failed to get hashed password: %v", err)
+	}
+	return hashedPassword, nil
+}
+
+func (m *Sqlite) UpdatePassword(userID int, newPassword string) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("error hashing password: %v", err)
+	}
+	_, err = m.DB.Exec("UPDATE users SET hashed_password = ? WHERE id = ?", hashedPassword, userID)
+	if err != nil {
+		return fmt.Errorf("error updating password: %v", err)
+	}
+	return nil
+}

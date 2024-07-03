@@ -26,6 +26,8 @@ type UserRepo interface {
 	Authenticate(email, password string) (int, error)
 	Exists(id int) (bool, error)
 	GetUserByID(id int) (*models.User, error)
+	GetPassword(userId int) (string, error)
+	UpdatePassword(userID int, hashedPassword string) error
 }
 
 type SessionRepo interface {
