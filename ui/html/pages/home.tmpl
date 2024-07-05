@@ -10,7 +10,18 @@
                     <p>{{.Content}}</p>
                     <div class="metadata">
                         <span>Created: {{humanDate .Created}}</span>
-                        <!-- Add likes and dislikes if needed -->
+                        <div class="likes-dislikes">
+                            <form action="/post/like" method="post" class="like-form">
+                                <input type="hidden" name="postID" value="{{.ID}}">
+                                <button type="submit" class="like-button">Like</button>
+                                <span class="like-count">{{.Likes}}</span>
+                            </form>
+                            <form action="/post/dislike" method="post" class="dislike-form">
+                                <input type="hidden" name="postID" value="{{.ID}}">
+                                <button type="submit" class="dislike-button">Dislike</button>
+                                <span class="dislike-count">{{.Dislikes}}</span>
+                            </form>
+                        </div>
                     </div>
                 </div>
             {{end}}
