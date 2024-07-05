@@ -14,4 +14,23 @@
         </div>
     </div>
     {{end}}
+
+    <h2>Comments</h2>
+    {{if .Comments}}
+        {{range .Comments}}
+        <div class="comment">
+            <p>{{.Content}}</p>
+            <small>Posted by user {{.Username}} at {{humanDate .Created}}</small>
+        </div>
+        {{else}}
+        <p>No comments yet.</p>
+        {{end}}
+    {{end}}
+
+    <h3>Add a Comment</h3>
+    <form action="/post/comment" method="post">
+          <input type="hidden" name="PostId" value="{{.Post.ID}}">
+    <textarea name="Content" required></textarea>
+    <button type="submit">Add Comment</button>
+</form>
 {{end}}

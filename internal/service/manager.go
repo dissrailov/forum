@@ -27,6 +27,8 @@ type PostServiceI interface {
 	LikePost(userID, postID int) error
 	RemoveReaction(userID, postID int) error
 	GetUserReaction(userID, postID int) (int, error)
+	AddComment(postId, userId int, content string) error
+	GetCommentByPostId(postId int) ([]models.Comment, error)
 }
 
 type UserServiceI interface {

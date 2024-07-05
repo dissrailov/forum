@@ -14,6 +14,7 @@ func (h *HandlerApp) Routes() http.Handler {
 	mux.HandleFunc("/post/like", h.RequireAuth(h.LikePost))
 	mux.HandleFunc("/post/dislike", h.RequireAuth(h.DislikePost))
 	mux.HandleFunc("/post/create", h.RequireAuth(h.postCreate))
+	mux.HandleFunc("/post/comment", h.RequireAuth(h.AddComment))
 
 	// users
 	mux.HandleFunc("/user/signup", h.UserSignup)

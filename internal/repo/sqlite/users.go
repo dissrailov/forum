@@ -12,6 +12,8 @@ import (
 )
 
 func (s *Sqlite) CreateUser(name, email, password string) error {
+	op := "sqlite.CreateUser"
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
 		return err
@@ -22,7 +24,7 @@ func (s *Sqlite) CreateUser(name, email, password string) error {
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok {
 			if sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique && strings.Contains(sqliteErr.Error(), "email") {
-				return models.ErrDuplicateEmail
+				return fmt.Errorf("%s : %w", op, models.ErrDuplicateEmail)
 			}
 		}
 		return err
@@ -32,6 +34,7 @@ func (s *Sqlite) CreateUser(name, email, password string) error {
 }
 
 func (s *Sqlite) Authenticate(email, password string) (int, error) {
+	op := "sqlite.Authenticate"
 	var id int
 	var hashedPassword []byte
 
@@ -40,7 +43,7 @@ func (s *Sqlite) Authenticate(email, password string) (int, error) {
 	err := s.DB.QueryRow(stmt, email).Scan(&id, &hashedPassword)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, models.ErrInvalidCredentials
+			return 0, fmt.Errorf("%s: %w", op, models.ErrInvalidCredentials)
 		} else {
 			return 0, err
 		}
@@ -48,9 +51,9 @@ func (s *Sqlite) Authenticate(email, password string) (int, error) {
 	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return 0, models.ErrInvalidCredentials
+			return 0, fmt.Errorf("%s: %w", op, models.ErrInvalidCredentials)
 		} else {
-			return 0, err
+			return 0, fmt.Errorf("%s: %w", op, err)
 		}
 	}
 	return id, nil
@@ -71,30 +74,37 @@ func (s *Sqlite) GetUserByID(id int) (*models.User, error) {
 }
 
 func (m *Sqlite) Exists(id int) (bool, error) {
+	op := "sqlite.Exists"
 	var exists bool
 	stmt := `SELECT EXISTS(SELECT 1 FROM users WHERE id = ?);`
 	err := m.DB.QueryRow(stmt, id).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, err)
+
+	}
 	return exists, err
 }
 
 func (m *Sqlite) GetPassword(userId int) (string, error) {
+	op := "sqlite.GetPassword"
 	var hashedPassword string
 
 	err := m.DB.QueryRow("SELECT hashed_password FROM users WHERE id = ?", userId).Scan(&hashedPassword)
 	if err != nil {
-		return "", fmt.Errorf("failed to get hashed password: %v", err)
+		return "", fmt.Errorf("%s:failed to get hashed password:%w", op, err)
 	}
 	return hashedPassword, nil
 }
 
 func (m *Sqlite) UpdatePassword(userID int, newPassword string) error {
+	op := "sqlite.UpdatePassword"
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
 	if err != nil {
-		return fmt.Errorf("error hashing password: %v", err)
+		return fmt.Errorf("%s: error hashing password:%w", op, err)
 	}
 	_, err = m.DB.Exec("UPDATE users SET hashed_password = ? WHERE id = ?", hashedPassword, userID)
 	if err != nil {
-		return fmt.Errorf("error updating password: %v", err)
+		return fmt.Errorf("%s: error updating password: %w", op, err)
 	}
 	return nil
 }

@@ -25,4 +25,11 @@ type UserPostReaction struct {
 	Reaction int // 1 для лайка, -1 для дизлайка
 }
 
-//добавить в форму лайки
+type Comment struct {
+	ID       int
+	PostId   int
+	UserId   int
+	Username string
+	Content  string
+	Created  time.Time
+}

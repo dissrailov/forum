@@ -92,10 +92,15 @@ func (h *HandlerApp) postView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	comments, err := h.service.GetCommentByPostId(id)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
 
 	data := h.NewTemplateData(r)
 	data.Post = post
-
+	data.Comments = &comments
 	h.Render(w, http.StatusOK, "view.tmpl", data)
 
 }
@@ -184,4 +189,29 @@ func (h *HandlerApp) DislikePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (h *HandlerApp) AddComment(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		postIDStr := r.FormValue("PostId")
+		postID, err := strconv.Atoi(postIDStr)
+		if err != nil || postID < 1 {
+			log.Println(err)
+			h.NotFound(w)
+			return
+		}
+		userID, err := h.service.GetUser(r)
+		content := r.FormValue("Content")
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		err = h.service.AddComment(postID, userID.ID, content)
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, "Unable to add comment", http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", postID), http.StatusSeeOther)
+	}
 }
