@@ -14,14 +14,32 @@ body {
 h2 {
     color: #333;
 }
-
 .post-list {
-    margin-top: 20px;
+    margin: 20px auto; /* Центрируем блок по горизонтали и добавляем отступы сверху и снизу */
+    max-width: 800px; /* Максимальная ширина блока, чтобы содержимое не было слишком широким на больших экранах */
+}
+
+.post {
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    padding: 20px;
+    margin-bottom: 20px;
 }
+
+.post h3 {
+    margin-top: 0;
+}
+
+.post p {
+    margin-bottom: 10px;
+}
+
+.post .metadata {
+    color: #888;
+    font-size: 0.9em;
+}
+
 
 .post-table {
     width: 100%;
@@ -78,6 +96,52 @@ h2 {
 }
 
 /* Account details styles */
+/* Styles for Your Account section */
+.account-details {
+    max-width: 600px; /* Максимальная ширина контейнера для улучшенного визуального восприятия */
+    margin: 20px auto; /* Центрирование блока по центру и добавление отступов */
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.account-details h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.account-details table {
+    width: 100%;
+    border-collapse: collapse; /* Склеиваем границы ячеек таблицы */
+    margin-bottom: 15px;
+}
+
+.account-details th,
+.account-details td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd; /* Горизонтальная линия под ячейками */
+}
+
+.account-details th {
+    text-align: left;
+    color: #007bff; /* Цвет заголовков столбцов */
+}
+
+.account-details a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.account-details a:hover {
+    text-decoration: underline;
+}
+
+.account-details td {
+    color: #555; /* Цвет текста в ячейках */
+}
+
+
 .account-table {
     margin-top: 20px;
     background-color: #fff;
