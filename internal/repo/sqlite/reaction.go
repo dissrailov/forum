@@ -48,5 +48,5 @@ func (s *Sqlite) RemoveReaction(userID, postID int) error {
 	} else {
 		_, err = s.DB.Exec(`UPDATE posts SET dislikes = dislikes - 1 WHERE id = ?`, postID)
 	}
-	return fmt.Errorf("%s : %w", op, err)
+	return nil
 }
