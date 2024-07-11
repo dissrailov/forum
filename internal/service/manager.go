@@ -20,7 +20,7 @@ func NewService(repo repo.RepoI) ServiceI {
 }
 
 type PostServiceI interface {
-	CreatePost(title string, content string, expires int) (int, error)
+	CreatePost(title string, content, token string, expires int) (int, error)
 	GetPostId(id int) (*models.Post, error)
 	GetLastPost() (*[]models.Post, error)
 	DislikePost(userID, postID int) error

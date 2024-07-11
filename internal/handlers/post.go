@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"forum/internal/models"
+	"forum/internal/pkg/cookie"
 	"log"
 	"net/http"
 	"strconv"
@@ -59,8 +60,9 @@ func (h *HandlerApp) postCreatePost(w http.ResponseWriter, r *http.Request) {
 		h.Render(w, http.StatusUnprocessableEntity, "create.tmpl", data)
 		return
 	}
+	cookies := cookie.GetSessionCookie("session_id", r)
 
-	id, err := h.service.CreatePost(title, content, expires)
+	id, err := h.service.CreatePost(title, content, cookies.Value, expires)
 	if err != nil {
 		h.ServerError(w, err)
 		return

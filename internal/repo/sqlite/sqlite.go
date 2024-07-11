@@ -23,6 +23,7 @@ func NewDB(dsn string) (*Sqlite, error) {
 	queries := []string{
 		`CREATE TABLE IF NOT EXISTS posts (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER,
 		title TEXT NOT NULL,
 		content TEXT NOT NULL,
 		likes INTEGER DEFAULT 0,

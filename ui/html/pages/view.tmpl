@@ -6,7 +6,10 @@
         <div class='metadata'>
             <strong>{{.Title}}</strong>
         </div>
+        </div>
         <pre><code>{{.Content}}</code></pre>
+        <div class='metadata'>
+          Author: {{.UserName}}
         <div class='metadata'>
             <time>Created: {{humanDate .Created}}</time>
         </div>
@@ -27,8 +30,8 @@
 
     <h3>Add a Comment</h3>
     <form action="/post/comment" method="post">
-          <input type="hidden" name="PostId" value="{{.Post.ID}}">
-    <textarea name="Content" required></textarea>
-    <button type="submit">Add Comment</button>
-</form>
+        <input type="hidden" name="PostId" value="{{.Post.ID}}">
+        <textarea name="Content" required></textarea>
+        <button type="submit">Add Comment</button>
+    </form>
 {{end}}

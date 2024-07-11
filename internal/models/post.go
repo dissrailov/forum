@@ -4,6 +4,8 @@ import "time"
 
 type Post struct {
 	ID       int
+	UserID   int
+	UserName string
 	Title    string
 	Content  string
 	Likes    int

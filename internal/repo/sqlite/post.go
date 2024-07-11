@@ -7,29 +7,31 @@ import (
 	"forum/internal/models"
 )
 
-func (s *Sqlite) CreatePost(title string, content string, expires int) (int, error) {
+func (s *Sqlite) CreatePost(title string, content string, userid, expires int) (int, error) {
 	op := "sqlite.CreatePost"
-	stmt := `INSERT INTO posts (title, content, created, expires)
-	VALUES (?, ?, datetime('now'), datetime('now', '+' || ? || ' day'))`
-	result, err := s.DB.Exec(stmt, title, content, expires)
+	stmt := `INSERT INTO posts (title, content, created, user_id, expires)
+	VALUES (?, ?, datetime('now'), ?, datetime('now', '+' || ? || ' day'))`
+	result, err := s.DB.Exec(stmt, title, content, userid, expires)
 	if err != nil {
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return -1, fmt.Errorf("%s: %w", op, err)
+	}
 
-	}
-	id, err := result.LastInsertId()
+	postID, err := result.LastInsertId()
 	if err != nil {
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return -1, fmt.Errorf("%s: %w", op, err)
 	}
-	return int(id), nil
+
+	return int(postID), nil
 }
 
 func (s *Sqlite) GetPostId(id int) (*models.Post, error) {
 	op := "sqlite.GetPostId"
-	stmt := `SELECT id, title, content, created, expires FROM posts
-WHERE expires > DATETIME('now') AND id = ?`
-	row := s.DB.QueryRow(stmt, id)
+	stmt := `SELECT p.id, p.user_id, p.title, p.content, p.created, p.expires, p.likes, p.dislikes, u.name
+	FROM posts p
+	JOIN users u ON p.user_id = u.id 
+	WHERE p.id = ?`
 	p := &models.Post{}
-	err := row.Scan(&p.ID, &p.Title, &p.Content, &p.Created, &p.Expires)
+	err := s.DB.QueryRow(stmt, id).Scan(&p.ID, &p.UserID, &p.Title, &p.Content, &p.Created, &p.Expires, &p.Likes, &p.Dislikes, &p.UserName)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("%s : %w", op, models.ErrNoRecord)

@@ -4,8 +4,16 @@ import (
 	"forum/internal/models"
 )
 
-func (s *service) CreatePost(title string, content string, expires int) (int, error) {
-	return s.repo.CreatePost(title, content, expires)
+func (s *service) CreatePost(title string, content, token string, expires int) (int, error) {
+	userId, err := s.repo.GetUserIDByToken(token)
+	if err != nil {
+		return 0, err
+	}
+	postID, err := s.repo.CreatePost(title, content, userId, expires)
+	if err != nil {
+		return 0, err
+	}
+	return postID, err
 }
 
 func (s *service) GetPostId(id int) (*models.Post, error) {
