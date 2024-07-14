@@ -3,10 +3,7 @@ package handlers
 import (
 	"errors"
 	"forum/internal/models"
-	"forum/internal/pkg/validator"
 	"net/http"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (h *HandlerApp) AccountView(w http.ResponseWriter, r *http.Request) {
@@ -39,47 +36,22 @@ func (h *HandlerApp) AccountChangePasswordGet(w http.ResponseWriter, r *http.Req
 }
 
 func (h *HandlerApp) AccountChangePasswordPost(w http.ResponseWriter, r *http.Request) {
-	oldPassword := r.FormValue("currentPassword")
-	newPassword := r.FormValue("newPassword")
-	newpasswordconfirm := r.FormValue("newPasswordConfirmation")
 	form := models.AccountPasswordUpdateForm{
-		CurrentPassword:         oldPassword,
-		NewPassword:             newPassword,
-		NewPasswordConfirmation: newpasswordconfirm,
+		CurrentPassword:         r.FormValue("currentPassword"),
+		NewPassword:             r.FormValue("newPassword"),
+		NewPasswordConfirmation: r.FormValue("newPasswordConfirmation"),
 	}
+	data := h.NewTemplateData(r)
 	err := r.ParseForm()
 	if err != nil {
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
-	form.CheckField(validator.NotBlank(form.CurrentPassword), "currentPassword", "This field cannot be blank")
-	form.CheckField(validator.NotBlank(form.NewPassword), "newPassword", "This field cannot be blank")
-	form.CheckField(validator.MinChars(form.NewPassword, 8), "newPassword", "This field must be at least 8 characters long")
-	form.CheckField(validator.NotBlank(form.NewPasswordConfirmation), "newPasswordConfirmation", "This field cannot be blank")
-	form.CheckField(form.NewPassword == form.NewPasswordConfirmation, "newPasswordConfirmation", "Passwords do not match")
-
-	if !form.Valid() {
-		data := h.NewTemplateData(r)
-		data.Form = form
-		h.Render(w, http.StatusUnprocessableEntity, "password.tmpl", data)
-		return
-	}
-
 	userid, err := h.service.GetUser(r)
 	if err != nil {
 		h.ServerError(w, err)
 	}
-	hashedPassword, err := h.service.GetPassword(userid.ID)
-	if err != nil {
-		http.Error(w, "User not found", http.StatusInternalServerError)
-		return
-	}
-	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(oldPassword))
-	if err != nil {
-		http.Error(w, "Old password incorrect", http.StatusUnauthorized)
-		return
-	}
-	err = h.service.UpdatePassword(userid.ID, newPassword)
+	data, err = h.service.UpdatePassword(form, data, userid.ID)
 	if err != nil {
 		http.Error(w, "Error updating password ", http.StatusInternalServerError)
 		return

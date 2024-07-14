@@ -1,10 +1,8 @@
 package handlers
 
 import (
-	"errors"
 	"forum/internal/models"
 	"forum/internal/pkg/cookie"
-	"forum/internal/pkg/validator"
 	"net/http"
 	"strings"
 )
@@ -23,38 +21,24 @@ func (h *HandlerApp) UserSignupPost(w http.ResponseWriter, r *http.Request) {
 		Email:    strings.ToLower(r.FormValue("email")),
 		Password: r.FormValue("password"),
 	}
+	data := h.NewTemplateData(r)
 	err := r.ParseForm()
 	if err != nil {
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
-	form.CheckField(validator.NotBlank(form.Name), "name", "This field cannot be blank")
-	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
-	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
-	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
-	form.CheckField(validator.MinChars(form.Password, 8), "password", "This field must be at least 8 characters long")
 
-	if !form.Valid() {
-		data := h.NewTemplateData(r)
-		data.Form = form
-		h.Render(w, http.StatusUnprocessableEntity, "signup.tmpl", data)
-		return
-	}
-
-	err = h.service.CreateUser(form.Name, form.Email, form.Password)
+	data, err = h.service.CreateUser(form, data)
 	if err != nil {
-		if errors.Is(err, models.ErrDuplicateEmail) {
-			form.AddFieldErrors("email", "Email address is already in use")
-			data := h.NewTemplateData(r)
-			data.Form = form
-			h.Render(w, http.StatusUnprocessableEntity, "signup.tmpl", data)
+		if err == models.ErrNotValidPostForm {
+			h.Render(w, http.StatusBadRequest, "signup.tmpl", data)
 			return
 		} else {
 			h.ServerError(w, err)
+			return
 		}
-		return
 	}
-	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther) // redirect to login page
 }
 
 func (h *HandlerApp) UserSignupGet(w http.ResponseWriter, r *http.Request) {
@@ -76,37 +60,21 @@ func (h *HandlerApp) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		Email:    strings.ToLower(r.FormValue("email")),
 		Password: r.FormValue("password"),
 	}
-
+	data := h.NewTemplateData(r)
 	err := r.ParseForm()
 	if err != nil {
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
-
-	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
-	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
-	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
-
-	if !form.Valid() {
-		data := h.NewTemplateData(r)
-		data.Form = form
-		h.Render(w, http.StatusUnprocessableEntity, "login.tmpl", data)
-		return
-	}
-
-	session, err := h.service.Authenticate(form.Email, form.Password)
+	session, templateData, err := h.service.Authenticate(&form, data)
 	if err != nil {
-		if errors.Is(err, models.ErrInvalidCredentials) {
-			form.AddNonFieldErrors("Email or password incorrect")
-			data := h.NewTemplateData(r)
-			data.Form = form
-			h.Render(w, http.StatusUnprocessableEntity, "login.tmpl", data)
-		} else {
-			h.ServerError(w, err)
+		if err == models.ErrNotValidPostForm {
+			h.Render(w, http.StatusBadRequest, "login.tmpl", templateData)
+			return
 		}
+		h.ServerError(w, err)
 		return
 	}
-	
 	cookie.SetSessionCookie("session_id", w, session.Token, session.ExpTime)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -125,5 +93,3 @@ func (h *HandlerApp) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
-
-

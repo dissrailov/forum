@@ -32,10 +32,10 @@ type PostServiceI interface {
 }
 
 type UserServiceI interface {
-	CreateUser(name, email, password string) error
-	Authenticate(email, password string) (*models.Session, error)
+	CreateUser(form models.UserSignupForm, data *models.TemplateData) (*models.TemplateData, error)
+	Authenticate(form *models.UserLoginForm, data *models.TemplateData) (*models.Session, *models.TemplateData, error)
 	DeleteSession(token string) error
 	GetUser(r *http.Request) (*models.User, error)
 	GetPassword(userId int) (string, error)
-	UpdatePassword(userID int, hashedPassword string) error
+	UpdatePassword(form models.AccountPasswordUpdateForm, data *models.TemplateData, userID int) (*models.TemplateData, error)
 }
