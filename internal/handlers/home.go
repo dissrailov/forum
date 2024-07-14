@@ -15,6 +15,6 @@ func (h *HandlerApp) Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := h.NewTemplateData(r)
-	data.Posts = posts
+	data.Posts = &posts // Присваиваем значение posts типа []models.Post
 	h.Render(w, http.StatusOK, "home.tmpl", data)
 }

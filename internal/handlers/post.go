@@ -9,8 +9,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
-	"unicode/utf8"
 )
 
 func (h *HandlerApp) postCreate(w http.ResponseWriter, r *http.Request) {
@@ -27,44 +25,24 @@ func (h *HandlerApp) postCreatePost(w http.ResponseWriter, r *http.Request) {
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
-	title := r.PostForm.Get("title")
-	content := r.PostForm.Get("content")
-
-	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
-	if err != nil {
-		h.ClientError(w, http.StatusBadRequest)
-		return
-	}
 
 	form := models.PostCreateForm{
-		Title:       r.PostForm.Get("title"),
-		Content:     r.PostForm.Get("content"),
-		Expires:     expires,
-		FieldErrors: map[string]string{},
+		Title:   r.PostForm.Get("title"),
+		Content: r.PostForm.Get("content"),
 	}
 
-	if strings.TrimSpace(title) == "" {
-		form.FieldErrors["title"] = "this field cannot be blank"
-	} else if utf8.RuneCountInString(title) > 100 {
-		form.FieldErrors["title"] = "this field cannot be more than 100 characters long"
-	}
-	if strings.TrimSpace(content) == "" {
-		form.FieldErrors["content"] = "this field cannot be blank"
-	}
-	if expires != 1 && expires != 7 && expires != 365 {
-		form.FieldErrors["expires"] = "This field must equal 1, 7 or 365"
-	}
-	if len(form.FieldErrors) > 0 {
-		data := h.NewTemplateData(r)
-		data.Form = form
-		h.Render(w, http.StatusUnprocessableEntity, "create.tmpl", data)
-		return
-	}
 	cookies := cookie.GetSessionCookie("session_id", r)
+	data := h.NewTemplateData(r)
 
-	id, err := h.service.CreatePost(title, content, cookies.Value, expires)
+	data, id, err := h.service.CreatePost(cookies.Value, form, data)
 	if err != nil {
 		h.ServerError(w, err)
+		return
+	}
+	if len(form.FieldErrors) > 0 {
+		data = h.NewTemplateData(r)
+		data.Form = form
+		h.Render(w, http.StatusUnprocessableEntity, "create.tmpl", data)
 		return
 	}
 	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", id), http.StatusSeeOther)
@@ -72,9 +50,8 @@ func (h *HandlerApp) postCreatePost(w http.ResponseWriter, r *http.Request) {
 
 func (h *HandlerApp) postCreateGet(w http.ResponseWriter, r *http.Request) {
 	data := h.NewTemplateData(r)
-	data.Form = models.PostCreateForm{
-		Expires: 365,
-	}
+	data.Form = models.PostCreateForm{}
+
 	h.Render(w, http.StatusOK, "create.tmpl", data)
 }
 

@@ -7,11 +7,11 @@ import (
 	"forum/internal/models"
 )
 
-func (s *Sqlite) CreatePost(title string, content string, userid, expires int) (int, error) {
+func (s *Sqlite) CreatePost(title string, content string, userID int) (int, error) {
 	op := "sqlite.CreatePost"
-	stmt := `INSERT INTO posts (title, content, created, user_id, expires)
-	VALUES (?, ?, datetime('now'), ?, datetime('now', '+' || ? || ' day'))`
-	result, err := s.DB.Exec(stmt, title, content, userid, expires)
+	stmt := `INSERT INTO posts (title, content, created, user_id)
+	VALUES (?, ?, datetime('now'), ?)`
+	result, err := s.DB.Exec(stmt, title, content, userID)
 	if err != nil {
 		return -1, fmt.Errorf("%s: %w", op, err)
 	}
@@ -26,12 +26,12 @@ func (s *Sqlite) CreatePost(title string, content string, userid, expires int) (
 
 func (s *Sqlite) GetPostId(id int) (*models.Post, error) {
 	op := "sqlite.GetPostId"
-	stmt := `SELECT p.id, p.user_id, p.title, p.content, p.created, p.expires, p.likes, p.dislikes, u.name
-	FROM posts p
-	JOIN users u ON p.user_id = u.id 
-	WHERE p.id = ?`
+	stmt := `SELECT p.id, p.user_id, p.title, p.content, p.created, p.likes, p.dislikes, u.name
+    FROM posts p
+    JOIN users u ON p.user_id = u.id 
+    WHERE p.id = ?`
 	p := &models.Post{}
-	err := s.DB.QueryRow(stmt, id).Scan(&p.ID, &p.UserID, &p.Title, &p.Content, &p.Created, &p.Expires, &p.Likes, &p.Dislikes, &p.UserName)
+	err := s.DB.QueryRow(stmt, id).Scan(&p.ID, &p.UserID, &p.Title, &p.Content, &p.Created, &p.Likes, &p.Dislikes, &p.UserName)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("%s : %w", op, models.ErrNoRecord)
@@ -42,11 +42,11 @@ func (s *Sqlite) GetPostId(id int) (*models.Post, error) {
 	return p, nil
 }
 
-func (s *Sqlite) GetLastPost() (*[]models.Post, error) {
+func (s *Sqlite) GetLastPost() ([]models.Post, error) {
 	op := "sqlite.GetLastPost"
 
-	stmt := `SELECT id, title, content, likes, dislikes, created, expires FROM posts
-	WHERE expires > datetime('now') ORDER BY id DESC LIMIT 10`
+	stmt := `SELECT id, title, content, likes, dislikes, created FROM posts
+    ORDER BY id DESC LIMIT 10`
 	rows, err := s.DB.Query(stmt)
 	if err != nil {
 		return nil, fmt.Errorf("%s : %w", op, err)
@@ -56,7 +56,7 @@ func (s *Sqlite) GetLastPost() (*[]models.Post, error) {
 	var posts []models.Post
 	for rows.Next() {
 		var p models.Post
-		err = rows.Scan(&p.ID, &p.Title, &p.Content, &p.Likes, &p.Dislikes, &p.Created, &p.Expires)
+		err = rows.Scan(&p.ID, &p.Title, &p.Content, &p.Likes, &p.Dislikes, &p.Created)
 		if err != nil {
 			return nil, fmt.Errorf("%s : %w", op, err)
 		}
@@ -66,7 +66,7 @@ func (s *Sqlite) GetLastPost() (*[]models.Post, error) {
 	if err = rows.Err(); err != nil {
 		return nil, fmt.Errorf("%s : %w", op, err)
 	}
-	return &posts, nil
+	return posts, nil
 }
 
 func (s *Sqlite) AddComment(postId, userId int, content string) error {

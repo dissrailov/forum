@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"forum/internal/pkg/validator"
+	"time"
+)
 
 type Post struct {
 	ID       int
@@ -15,10 +18,9 @@ type Post struct {
 }
 
 type PostCreateForm struct {
-	Title       string
-	Content     string
-	Expires     int
-	FieldErrors map[string]string
+	Title               string
+	Content             string
+	validator.Validator `form:"-"`
 }
 
 type UserPostReaction struct {

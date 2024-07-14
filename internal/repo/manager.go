@@ -16,9 +16,9 @@ type RepoI interface {
 }
 
 type PostRepo interface {
-	CreatePost(title string, content string, userid, expires int) (int, error)
+	CreatePost(title string, content string, userID int) (int, error)
 	GetPostId(id int) (*models.Post, error)
-	GetLastPost() (*[]models.Post, error)
+	GetLastPost() ([]models.Post, error)
 	LikePost(userID, postID int) error
 	DislikePost(userID, postID int) error
 	GetUserReaction(userID, postID int) (int, error)

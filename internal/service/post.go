@@ -2,30 +2,43 @@ package service
 
 import (
 	"forum/internal/models"
+	"forum/internal/pkg/validator"
 )
 
-func (s *service) CreatePost(title string, content, token string, expires int) (int, error) {
-	userId, err := s.repo.GetUserIDByToken(token)
-	if err != nil {
-		return 0, err
+func (s *service) CreatePost(cookie string, form models.PostCreateForm, data *models.TemplateData) (*models.TemplateData, int, error) {
+	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank")
+	form.CheckField(validator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 characters long")
+	form.CheckField(validator.NotBlank(form.Content), "content", "This field cannot be blank")
+	form.CheckField(validator.MaxChars(form.Content, 250), "content", "This field cannot be more than 250 characters long")
+	form.CheckField(validator.MaxChars(form.Title, 250), "title", "This field cannot be more than 250 characters long")
+
+	if !form.Valid() {
+		data.Form = form
+		return data, 0, models.ErrInvalidCredentials
 	}
-	postID, err := s.repo.CreatePost(title, content, userId, expires)
+	userID, err := s.repo.GetUserIDByToken(cookie)
 	if err != nil {
-		return 0, err
+		return nil, 0, err
 	}
-	return postID, err
+	postID, err := s.repo.CreatePost(form.Title, form.Content, userID)
+	if err != nil {
+		return nil, 0, err
+	}
+	data.Form = form
+	return data, postID, nil
+
 }
 
 func (s *service) GetPostId(id int) (*models.Post, error) {
 	return s.repo.GetPostId(id)
 }
 
-func (s *service) GetLastPost() (*[]models.Post, error) {
-	post, err := s.repo.GetLastPost()
+func (s *service) GetLastPost() ([]models.Post, error) {
+	posts, err := s.repo.GetLastPost()
 	if err != nil {
 		return nil, err
 	}
-	return post, nil
+	return posts, nil
 }
 
 func (s *service) DislikePost(userID, postID int) error {
