@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"forum/internal/models"
@@ -106,30 +105,15 @@ func (h *HandlerApp) LikePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, _ := h.service.GetUser(r) // Функция для получения идентификатора текущего пользователя
-
-	reaction, err := h.service.GetUserReaction(userID.ID, postID)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	userID, err := h.service.GetUser(r)
+	if err != nil {
 		h.ServerError(w, err)
-		return
 	}
 
-	if reaction == 1 {
-		if err := h.service.RemoveReaction(userID.ID, postID); err != nil {
-			h.ServerError(w, err)
-			return
-		}
-	} else {
-		if reaction == -1 {
-			if err := h.service.RemoveReaction(userID.ID, postID); err != nil {
-				h.ServerError(w, err)
-				return
-			}
-		}
-		if err := h.service.LikePost(userID.ID, postID); err != nil {
-			http.Error(w, "Failed to like post", http.StatusInternalServerError)
-			return
-		}
+	err = h.service.LikePost(userID.ID, postID)
+	if err != nil {
+		h.ServerError(w, err)
+		return
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -149,32 +133,16 @@ func (h *HandlerApp) DislikePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, _ := h.service.GetUser(r) // Функция для получения идентификатора текущего пользователя
+	userID, err := h.service.GetUser(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
 
-	reaction, err := h.service.GetUserReaction(userID.ID, postID)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	err = h.service.DislikePost(userID.ID, postID)
+	if err != nil {
 		h.ServerError(w, err)
 		return
 	}
-
-	if reaction == -1 {
-		if err := h.service.RemoveReaction(userID.ID, postID); err != nil {
-			h.ServerError(w, err)
-			return
-		}
-	} else {
-		if reaction == 1 {
-			if err := h.service.RemoveReaction(userID.ID, postID); err != nil {
-				h.ServerError(w, err)
-				return
-			}
-		}
-		if err := h.service.DislikePost(userID.ID, postID); err != nil {
-			http.Error(w, "Failed to dislike post", http.StatusInternalServerError)
-			return
-		}
-	}
-
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -183,7 +151,6 @@ func (h *HandlerApp) AddComment(w http.ResponseWriter, r *http.Request) {
 		postIDStr := r.FormValue("PostId")
 		postID, err := strconv.Atoi(postIDStr)
 		if err != nil || postID < 1 {
-			log.Println(err)
 			h.NotFound(w)
 			return
 		}
@@ -195,7 +162,6 @@ func (h *HandlerApp) AddComment(w http.ResponseWriter, r *http.Request) {
 		}
 		err = h.service.AddComment(postID, userID.ID, content)
 		if err != nil {
-			fmt.Println(err)
 			http.Error(w, "Unable to add comment", http.StatusInternalServerError)
 			return
 		}

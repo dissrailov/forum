@@ -1,6 +1,8 @@
 package service
 
 import (
+	"database/sql"
+	"errors"
 	"forum/internal/models"
 	"forum/internal/pkg/validator"
 )
@@ -42,11 +44,44 @@ func (s *service) GetLastPost() ([]models.Post, error) {
 }
 
 func (s *service) DislikePost(userID, postID int) error {
-	return s.repo.DislikePost(userID, postID)
+	reaction, err := s.repo.GetUserReaction(userID, postID)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return err
+	}
+
+	if reaction == 1 || reaction == -1 {
+		if err := s.repo.RemoveReaction(userID, postID); err != nil {
+			return err
+		}
+	}
+
+	if reaction != -1 {
+		if err := s.repo.DislikePost(userID, postID); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (s *service) LikePost(userID, postID int) error {
-	return s.repo.LikePost(userID, postID)
+	reaction, err := s.repo.GetUserReaction(userID, postID)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return err
+	}
+
+	if reaction == 1 || reaction == -1 {
+		if err := s.repo.RemoveReaction(userID, postID); err != nil {
+			return err
+		}
+	}
+
+	if reaction != 1 {
+		if err := s.repo.LikePost(userID, postID); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *service) AddComment(postId, userId int, content string) error {
