@@ -37,5 +37,6 @@ type UserServiceI interface {
 	DeleteSession(token string) error
 	GetUser(r *http.Request) (*models.User, error)
 	GetPassword(userId int) (string, error)
-	UpdatePassword(form models.AccountPasswordUpdateForm, data *models.TemplateData, userID int) (*models.TemplateData, error)
+	ValidatePasswordForm(form *models.AccountPasswordUpdateForm) error
+	UpdatePassword(userID int, oldPassword, newPassword string) error
 }

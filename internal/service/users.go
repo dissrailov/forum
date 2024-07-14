@@ -56,7 +56,7 @@ func (s *service) Authenticate(form *models.UserLoginForm, data *models.Template
 
 	if !form.Valid() {
 		data.Form = form
-		return nil, data, models.ErrNotValidPostForm
+		return nil, nil, models.ErrNotValidPostForm
 	}
 
 	userId, err := s.repo.Authenticate(form.Email, form.Password)
@@ -64,18 +64,18 @@ func (s *service) Authenticate(form *models.UserLoginForm, data *models.Template
 		if errors.Is(err, models.ErrInvalidCredentials) {
 			form.AddFieldErrors("email", "Email or password is incorrect")
 			data.Form = form
-			return nil, data, models.ErrNotValidPostForm
+			return nil, nil, models.ErrNotValidPostForm
 		} else {
 			return nil, nil, err
 		}
 	}
 	session := models.NewSession(userId)
 	if err = s.repo.DeleteSessionById(userId); err != nil {
-		return nil, data, err
+		return nil, nil, err
 	}
 	err = s.repo.CreateSession(session)
 	if err != nil {
-		return nil, data, err
+		return nil, nil, err
 	}
 	return session, data, nil
 }
@@ -93,26 +93,28 @@ func (s *service) GetPassword(userId int) (string, error) {
 	return s.repo.GetPassword(userId)
 }
 
-func (s *service) UpdatePassword(form models.AccountPasswordUpdateForm, data *models.TemplateData, userID int) (*models.TemplateData, error) {
-	form.CheckField(validator.NotBlank(form.CurrentPassword), "currentPassword", "This field cannot be blank")
-	form.CheckField(validator.NotBlank(form.NewPassword), "newPassword", "This field cannot be blank")
-	form.CheckField(validator.MinChars(form.NewPassword, 8), "newPassword", "This field must be at least 8 characters long")
-	form.CheckField(validator.NotBlank(form.NewPasswordConfirmation), "newPasswordConfirmation", "This field cannot be blank")
-	form.CheckField(form.NewPassword == form.NewPasswordConfirmation, "newPasswordConfirmation", "Passwords do not match")
-	if !form.Valid() {
-		data.Form = form
-		return data, nil
-	}
+func (s *service) UpdatePassword(userID int, oldPassword, newPassword string) error {
 	hashedPassword, err := s.GetPassword(userID)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(form.CurrentPassword))
+
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(oldPassword))
 	if err != nil {
-		return nil, err
+		return errors.New("old password incorrect")
 	}
-	data.Form = form
-	return data, err
+
+	newHashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.UpdatePassword(userID, string(newHashedPassword))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 func (s *service) GetUserReaction(userID, postID int) (int, error) {
 	return s.repo.GetUserReaction(userID, postID)
@@ -120,4 +122,17 @@ func (s *service) GetUserReaction(userID, postID int) (int, error) {
 
 func (s *service) RemoveReaction(userID, postID int) error {
 	return s.repo.RemoveReaction(userID, postID)
+}
+
+func (s *service) ValidatePasswordForm(form *models.AccountPasswordUpdateForm) error {
+	form.CheckField(validator.NotBlank(form.CurrentPassword), "currentPassword", "This field cannot be blank")
+	form.CheckField(validator.NotBlank(form.NewPassword), "newPassword", "This field cannot be blank")
+	form.CheckField(validator.MinChars(form.NewPassword, 8), "newPassword", "This field must be at least 8 characters long")
+	form.CheckField(validator.NotBlank(form.NewPasswordConfirmation), "newPasswordConfirmation", "This field cannot be blank")
+	form.CheckField(form.NewPassword == form.NewPasswordConfirmation, "newPasswordConfirmation", "Passwords do not match")
+
+	if !form.Valid() {
+		return errors.New("invalid form data")
+	}
+	return nil
 }

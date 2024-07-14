@@ -16,7 +16,10 @@ func (h *HandlerApp) AccountView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	data := h.NewTemplateData(r)
+	data, err := h.NewTemplateData(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
 	data.User = userId
 	h.Render(w, http.StatusOK, "account.tmpl", data)
 }
@@ -30,31 +33,61 @@ func (h *HandlerApp) AccountChangePassword(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *HandlerApp) AccountChangePasswordGet(w http.ResponseWriter, r *http.Request) {
-	data := h.NewTemplateData(r)
+	data, err := h.NewTemplateData(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
 	data.Form = models.AccountPasswordUpdateForm{}
 	h.Render(w, http.StatusOK, "password.tmpl", data)
 }
 
 func (h *HandlerApp) AccountChangePasswordPost(w http.ResponseWriter, r *http.Request) {
-	form := models.AccountPasswordUpdateForm{
-		CurrentPassword:         r.FormValue("currentPassword"),
-		NewPassword:             r.FormValue("newPassword"),
-		NewPasswordConfirmation: r.FormValue("newPasswordConfirmation"),
-	}
-	data := h.NewTemplateData(r)
 	err := r.ParseForm()
 	if err != nil {
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
-	userid, err := h.service.GetUser(r)
-	if err != nil {
-		h.ServerError(w, err)
+
+	form := models.AccountPasswordUpdateForm{
+		CurrentPassword:         r.FormValue("currentPassword"),
+		NewPassword:             r.FormValue("newPassword"),
+		NewPasswordConfirmation: r.FormValue("newPasswordConfirmation"),
 	}
-	data, err = h.service.UpdatePassword(form, data, userid.ID)
+
+	err = h.service.ValidatePasswordForm(&form)
 	if err != nil {
-		http.Error(w, "Error updating password ", http.StatusInternalServerError)
+		data, err := h.NewTemplateData(r)
+		if err != nil {
+			h.ClientError(w, http.StatusBadRequest)
+			return
+		}
+		data.Form = form
+		h.Render(w, http.StatusUnprocessableEntity, "password.tmpl", data)
 		return
 	}
+
+	userID, err := h.service.GetUser(r)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	err = h.service.UpdatePassword(userID.ID, form.CurrentPassword, form.NewPassword)
+	if err != nil {
+		if err.Error() == "old password incorrect" {
+			form.AddFieldErrors("currentPassword", "Old password is incorrect")
+			data, err := h.NewTemplateData(r)
+			if err != nil {
+				h.ServerError(w, err)
+				return
+			}
+			data.Form = form
+			h.Render(w, http.StatusUnprocessableEntity, "password.tmpl", data)
+		} else {
+			h.ServerError(w, err)
+		}
+		return
+	}
+
 	http.Redirect(w, r, "/account/view", http.StatusSeeOther)
 }

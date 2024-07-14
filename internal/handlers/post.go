@@ -32,24 +32,29 @@ func (h *HandlerApp) postCreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookies := cookie.GetSessionCookie("session_id", r)
-	data := h.NewTemplateData(r)
+	data, err := h.NewTemplateData(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
 
 	data, id, err := h.service.CreatePost(cookies.Value, form, data)
 	if err != nil {
-		h.ServerError(w, err)
-		return
-	}
-	if len(form.FieldErrors) > 0 {
-		data = h.NewTemplateData(r)
-		data.Form = form
-		h.Render(w, http.StatusUnprocessableEntity, "create.tmpl", data)
-		return
+		if err == models.ErrNotValidPostForm {
+			h.Render(w, http.StatusBadRequest, "create.tmpl", data)
+			return
+		} else {
+			h.ServerError(w, err)
+			return
+		}
 	}
 	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", id), http.StatusSeeOther)
 }
 
 func (h *HandlerApp) postCreateGet(w http.ResponseWriter, r *http.Request) {
-	data := h.NewTemplateData(r)
+	data, err := h.NewTemplateData(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
 	data.Form = models.PostCreateForm{}
 
 	h.Render(w, http.StatusOK, "create.tmpl", data)
@@ -77,7 +82,10 @@ func (h *HandlerApp) postView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := h.NewTemplateData(r)
+	data, err := h.NewTemplateData(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
 	data.Post = post
 	data.Comments = &comments
 	h.Render(w, http.StatusOK, "view.tmpl", data)

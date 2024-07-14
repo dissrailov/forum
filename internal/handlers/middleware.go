@@ -5,7 +5,6 @@ import (
 	"forum/internal/models"
 	"forum/internal/pkg/cookie"
 	"net/http"
-	"time"
 )
 
 func SecureHeaders(next http.Handler) http.Handler {
@@ -53,11 +52,19 @@ func (h *HandlerApp) methodResolver(w http.ResponseWriter, r *http.Request, get,
 	}
 }
 
-func (h *HandlerApp) NewTemplateData(r *http.Request) *models.TemplateData {
-	return &models.TemplateData{
-		CurrentYear:     time.Now().Year(),
-		IsAuthenticated: h.IsAuthenticated(r),
+func (h *HandlerApp) NewTemplateData(r *http.Request) (*models.TemplateData, error) {
+	var TemplateData models.TemplateData
+
+	TemplateData.IsAuthenticated = h.IsAuthenticated(r)
+
+	if TemplateData.IsAuthenticated {
+		user, err := h.service.GetUser(r)
+		if err != nil {
+			return nil, err
+		}
+		TemplateData.User = user
 	}
+	return &TemplateData, nil
 }
 
 func (h *HandlerApp) IsAuthenticated(r *http.Request) bool {
@@ -75,4 +82,3 @@ func (h *HandlerApp) RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 		next.ServeHTTP(w, r)
 	})
 }
-

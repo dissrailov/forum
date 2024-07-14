@@ -14,7 +14,10 @@ func (h *HandlerApp) Home(w http.ResponseWriter, r *http.Request) {
 		h.ServerError(w, err)
 		return
 	}
-	data := h.NewTemplateData(r)
+	data, err := h.NewTemplateData(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
 	data.Posts = &posts // Присваиваем значение posts типа []models.Post
 	h.Render(w, http.StatusOK, "home.tmpl", data)
 }

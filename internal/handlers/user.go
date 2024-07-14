@@ -21,8 +21,11 @@ func (h *HandlerApp) UserSignupPost(w http.ResponseWriter, r *http.Request) {
 		Email:    strings.ToLower(r.FormValue("email")),
 		Password: r.FormValue("password"),
 	}
-	data := h.NewTemplateData(r)
-	err := r.ParseForm()
+	data, err := h.NewTemplateData(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
+	err = r.ParseForm()
 	if err != nil {
 		h.ClientError(w, http.StatusBadRequest)
 		return
@@ -42,7 +45,10 @@ func (h *HandlerApp) UserSignupPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerApp) UserSignupGet(w http.ResponseWriter, r *http.Request) {
-	data := h.NewTemplateData(r)
+	data, err := h.NewTemplateData(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
 	data.Form = models.UserSignupForm{}
 	h.Render(w, http.StatusOK, "signup.tmpl", data)
 }
@@ -60,8 +66,11 @@ func (h *HandlerApp) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		Email:    strings.ToLower(r.FormValue("email")),
 		Password: r.FormValue("password"),
 	}
-	data := h.NewTemplateData(r)
-	err := r.ParseForm()
+	data, err := h.NewTemplateData(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
+	err = r.ParseForm()
 	if err != nil {
 		h.ClientError(w, http.StatusBadRequest)
 		return
@@ -80,7 +89,10 @@ func (h *HandlerApp) userLoginPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerApp) userLoginGet(w http.ResponseWriter, r *http.Request) {
-	data := h.NewTemplateData(r)
+	data, err := h.NewTemplateData(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
 	data.Form = models.UserLoginForm{}
 	h.Render(w, http.StatusOK, "login.tmpl", data)
 }
