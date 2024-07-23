@@ -10,7 +10,7 @@ type Post struct {
 	UserID     int
 	UserName   string
 	Title      string
-	Categories []string
+	Categories []Category
 	Content    string
 	Likes      int
 	Dislikes   int

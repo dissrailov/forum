@@ -36,7 +36,17 @@ func (s *service) CreatePost(cookie string, form models.PostCreateForm, data *mo
 }
 
 func (s *service) GetPostId(id int) (*models.Post, error) {
-	return s.repo.GetPostId(id)
+	posts, err := s.repo.GetPostId(id)
+	if err != nil {
+		return nil, err
+	}
+
+	categories, err := s.repo.GetCategoryByPostID(id)
+	if err != nil {
+		return nil, err
+	}
+	posts.Categories = categories
+	return posts, nil
 }
 
 func (s *service) GetLastPost() ([]models.Post, error) {
@@ -44,6 +54,7 @@ func (s *service) GetLastPost() ([]models.Post, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return posts, nil
 }
 
