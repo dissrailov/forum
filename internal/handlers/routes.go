@@ -10,7 +10,7 @@ func (h *HandlerApp) Routes() http.Handler {
 	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 	mux.HandleFunc("/", h.Home)
 	//post
-	mux.HandleFunc("/post/view", h.RequireAuth(h.postView))
+	mux.HandleFunc("/post/view", h.postView)
 	mux.HandleFunc("/post/like", h.RequireAuth(h.LikePost))
 	mux.HandleFunc("/post/dislike", h.RequireAuth(h.DislikePost))
 	mux.HandleFunc("/post/create", h.RequireAuth(h.postCreate))
