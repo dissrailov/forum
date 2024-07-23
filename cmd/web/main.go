@@ -27,7 +27,7 @@ func main() {
 	service := service.NewService(db)
 	app := app.New(infolog, errorlog, templateCache)
 	handlers := handlers.New(service, app)
-	// handlerapp := &handlers.HandlerApp{}
+
 	infolog.Println("Server is running on :http://localhost:8080")
 	srv := &http.Server{
 		Addr:     ":8080",
@@ -37,3 +37,8 @@ func main() {
 	err = srv.ListenAndServe()
 	errorlog.Fatal(err)
 }
+
+//Вам необходимо реализовать механизм фильтрации, который позволит пользователям фильтровать отображаемые сообщения по:
+// категории
+// созданные сообщения
+// понравившиеся посты
