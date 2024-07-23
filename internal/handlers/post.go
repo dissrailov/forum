@@ -24,12 +24,22 @@ func (h *HandlerApp) postCreatePost(w http.ResponseWriter, r *http.Request) {
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
-
-	form := models.PostCreateForm{
-		Title:   r.PostForm.Get("title"),
-		Content: r.PostForm.Get("content"),
+	categoryIDsStr := r.Form["categoryIDs[]"]
+	var categoryIDs []int
+	for _, idStr := range categoryIDsStr {
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		categoryIDs = append(categoryIDs, id)
 	}
 
+	form := models.PostCreateForm{
+		Title:       r.PostForm.Get("title"),
+		Content:     r.PostForm.Get("content"),
+		CategoryIDs: categoryIDs,
+	}
 	cookies := cookie.GetSessionCookie("session_id", r)
 	data, err := h.NewTemplateData(r)
 	if err != nil {
@@ -53,9 +63,16 @@ func (h *HandlerApp) postCreateGet(w http.ResponseWriter, r *http.Request) {
 	data, err := h.NewTemplateData(r)
 	if err != nil {
 		h.ServerError(w, err)
+		return
 	}
-	data.Form = models.PostCreateForm{}
 
+	categories, err := h.service.GetAllCategories()
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	data.Form = models.PostCreateForm{} // Очистка формы для предотвращения повторного заполнения данных
+	data.Categories = &categories
 	h.Render(w, http.StatusOK, "create.tmpl", data)
 }
 
@@ -80,15 +97,19 @@ func (h *HandlerApp) postView(w http.ResponseWriter, r *http.Request) {
 		h.ServerError(w, err)
 		return
 	}
-
+	categories, err := h.service.GetAllCategories()
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
 	data, err := h.NewTemplateData(r)
 	if err != nil {
 		h.ServerError(w, err)
 	}
 	data.Post = post
 	data.Comments = &comments
+	data.Categories = &categories
 	h.Render(w, http.StatusOK, "view.tmpl", data)
-
 }
 
 func (h *HandlerApp) LikePost(w http.ResponseWriter, r *http.Request) {

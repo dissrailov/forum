@@ -59,6 +59,17 @@ func NewDB(dsn string) (*Sqlite, error) {
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
 	);`,
+		`CREATE TABLE IF NOT EXISTS category (
+		id INTEGER PRIMARY KEY,
+		name TEXT NOT NULL
+	);`,
+		`CREATE TABLE IF NOT EXISTS post_category (
+		category_id INTEGER,
+		post_id INTEGER, 
+		PRIMARY KEY (category_id, post_id),
+		FOREIGN KEY (post_id) REFERENCES posts(id),
+		FOREIGN KEY (category_id) REFERENCES category(id)
+	);`,
 	}
 	for _, query := range queries {
 		stmt, err := db.Prepare(query)

@@ -6,12 +6,22 @@
         <div class='metadata'>
             <strong>{{.Title}}</strong>
         </div>
-        </div>
         <pre><code>{{.Content}}</code></pre>
         <div class='metadata'>
-          Author: {{.UserName}}
+            Author: {{.UserName}}
+        </div>
         <div class='metadata'>
             <time>Created: {{humanDate .Created}}</time>
+        </div>
+        <div class='metadata'>
+            Categories: 
+            {{if .Categories}}
+                {{range .Categories}}
+                    <span>{{.Name}}</span>
+                {{end}}
+            {{else}}
+                <span>No categories</span>
+            {{end}}
         </div>
     </div>
     {{end}}

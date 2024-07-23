@@ -8,27 +8,31 @@ import (
 )
 
 func (s *service) CreatePost(cookie string, form models.PostCreateForm, data *models.TemplateData) (*models.TemplateData, int, error) {
+	// Проверка валидности полей формы
 	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank")
 	form.CheckField(validator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 characters long")
 	form.CheckField(validator.NotBlank(form.Content), "content", "This field cannot be blank")
 	form.CheckField(validator.MaxChars(form.Content, 250), "content", "This field cannot be more than 250 characters long")
-	form.CheckField(validator.MaxChars(form.Title, 250), "title", "This field cannot be more than 250 characters long")
 
 	if !form.Valid() {
 		data.Form = form
-		return data, 0, models.ErrInvalidCredentials
+		return data, 0, models.ErrNotValidPostForm
 	}
+
 	userID, err := s.repo.GetUserIDByToken(cookie)
 	if err != nil {
 		return nil, 0, err
 	}
+
 	postID, err := s.repo.CreatePost(form.Title, form.Content, userID)
 	if err != nil {
 		return nil, 0, err
 	}
+	if err = s.repo.AddCategory(postID, form.CategoryIDs); err != nil {
+		return nil, 0, err
+	}
 	data.Form = form
 	return data, postID, nil
-
 }
 
 func (s *service) GetPostId(id int) (*models.Post, error) {
@@ -95,4 +99,20 @@ func (s *service) GetCommentByPostId(postId int) ([]models.Comment, error) {
 		return nil, err
 	}
 	return comment, nil
+}
+
+func (s *service) GetCategoryByPostID(postID int) ([]models.Category, error) {
+	category, err := s.repo.GetCategoryByPostID(postID)
+	if err != nil {
+		return nil, err
+	}
+	return category, nil
+}
+
+func (s *service) GetAllCategories() ([]models.Category, error) {
+	categories, err := s.repo.GetAllCategories()
+	if err != nil {
+		return nil, err
+	}
+	return categories, nil
 }

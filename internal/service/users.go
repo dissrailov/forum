@@ -56,7 +56,7 @@ func (s *service) Authenticate(form *models.UserLoginForm, data *models.Template
 
 	if !form.Valid() {
 		data.Form = form
-		return nil, nil, models.ErrNotValidPostForm
+		return nil, data, models.ErrNotValidPostForm
 	}
 
 	userId, err := s.repo.Authenticate(form.Email, form.Password)
@@ -64,7 +64,7 @@ func (s *service) Authenticate(form *models.UserLoginForm, data *models.Template
 		if errors.Is(err, models.ErrInvalidCredentials) {
 			form.AddFieldErrors("email", "Email or password is incorrect")
 			data.Form = form
-			return nil, nil, models.ErrNotValidPostForm
+			return nil, data, models.ErrNotValidPostForm
 		} else {
 			return nil, nil, err
 		}
@@ -77,6 +77,7 @@ func (s *service) Authenticate(form *models.UserLoginForm, data *models.Template
 	if err != nil {
 		return nil, nil, err
 	}
+	data.Form = form
 	return session, data, nil
 }
 
@@ -116,6 +117,7 @@ func (s *service) UpdatePassword(userID int, oldPassword, newPassword string) er
 
 	return nil
 }
+
 func (s *service) GetUserReaction(userID, postID int) (int, error) {
 	return s.repo.GetUserReaction(userID, postID)
 }

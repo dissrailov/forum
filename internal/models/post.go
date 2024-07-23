@@ -6,20 +6,23 @@ import (
 )
 
 type Post struct {
-	ID       int
-	UserID   int
-	UserName string
-	Title    string
-	Content  string
-	Likes    int
-	Dislikes int
-	Created  time.Time
-	Expires  time.Time
+	ID         int
+	UserID     int
+	UserName   string
+	Title      string
+	Categories []string
+	Content    string
+	Likes      int
+	Dislikes   int
+	Created    time.Time
+	Expires    time.Time
 }
 
 type PostCreateForm struct {
 	Title               string
 	Content             string
+	CategoryIDs         []int
+	Category            []string
 	validator.Validator `form:"-"`
 }
 

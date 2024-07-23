@@ -4,7 +4,7 @@
 <form action='/post/create' method='POST'>
     <div>
         <label>Title:</label>
-    {{with .Form.FieldErrors.Title}}
+        {{with .Form.FieldErrors.Title}}
             <label class='error'>{{.}}</label>
         {{end}}
         <!-- Re-populate the title data by setting the `value` attribute. -->
@@ -12,12 +12,18 @@
     </div>
     <div>
         <label>Content:</label>
-    {{with .Form.FieldErrors.Content}}
+        {{with .Form.FieldErrors.Content}}
             <label class='error'>{{.}}</label>
         {{end}}
         <!-- Re-populate the content data as the inner HTML of the textarea. -->
         <textarea name='content'>{{.Form.Content}}</textarea>
     </div>
+   <div>
+    <label>Select Categories:</label><br>
+    {{range .Categories}}
+        <input type="checkbox" name="categoryIDs[]" value="{{.ID}}"> {{.Name}}<br>
+    {{end}}
+</div>
     <div>
         <input type='submit' value='Publish post'>
     </div>

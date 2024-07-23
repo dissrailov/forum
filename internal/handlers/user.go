@@ -62,6 +62,11 @@ func (h *HandlerApp) userLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerApp) userLoginPost(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		h.ClientError(w, http.StatusBadRequest)
+		return
+	}
 	form := models.UserLoginForm{
 		Email:    strings.ToLower(r.FormValue("email")),
 		Password: r.FormValue("password"),
@@ -69,11 +74,6 @@ func (h *HandlerApp) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	data, err := h.NewTemplateData(r)
 	if err != nil {
 		h.ServerError(w, err)
-	}
-	err = r.ParseForm()
-	if err != nil {
-		h.ClientError(w, http.StatusBadRequest)
-		return
 	}
 	session, templateData, err := h.service.Authenticate(&form, data)
 	if err != nil {

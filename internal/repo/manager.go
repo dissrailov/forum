@@ -25,6 +25,10 @@ type PostRepo interface {
 	RemoveReaction(userID, postID int) error
 	AddComment(postId, userId int, content string) error
 	GetCommentByPostId(postId int) ([]models.Comment, error)
+	AddCategory(postID int, category []int) error
+	CreateCategory(names []string) error
+	GetCategoryByPostID(postID int) ([]models.Category, error)
+	GetAllCategories() ([]models.Category, error)
 }
 
 type UserRepo interface {

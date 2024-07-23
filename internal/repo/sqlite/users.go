@@ -43,7 +43,7 @@ func (s *Sqlite) Authenticate(email, password string) (int, error) {
 	err := s.DB.QueryRow(stmt, email).Scan(&id, &hashedPassword)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, fmt.Errorf("%s: %w", op, models.ErrInvalidCredentials)
+			return 0, models.ErrInvalidCredentials
 		} else {
 			return 0, err
 		}
@@ -51,7 +51,7 @@ func (s *Sqlite) Authenticate(email, password string) (int, error) {
 	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return 0, fmt.Errorf("%s: %w", op, models.ErrInvalidCredentials)
+			return 0, models.ErrInvalidCredentials
 		} else {
 			return 0, fmt.Errorf("%s: %w", op, err)
 		}
@@ -80,7 +80,6 @@ func (m *Sqlite) Exists(id int) (bool, error) {
 	err := m.DB.QueryRow(stmt, id).Scan(&exists)
 	if err != nil {
 		return false, fmt.Errorf("%s: %w", op, err)
-
 	}
 	return exists, err
 }

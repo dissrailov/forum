@@ -28,6 +28,8 @@ type PostServiceI interface {
 	RemoveReaction(userID, postID int) error
 	GetUserReaction(userID, postID int) (int, error)
 	AddComment(postId, userId int, content string) error
+	GetCategoryByPostID(postID int) ([]models.Category, error)
+	GetAllCategories() ([]models.Category, error)
 	GetCommentByPostId(postId int) ([]models.Comment, error)
 }
 
