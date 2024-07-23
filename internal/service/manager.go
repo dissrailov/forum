@@ -25,8 +25,6 @@ type PostServiceI interface {
 	GetLastPost() ([]models.Post, error)
 	DislikePost(userID, postID int) error
 	LikePost(userID, postID int) error
-	RemoveReaction(userID, postID int) error
-	GetUserReaction(userID, postID int) (int, error)
 	AddComment(postId, userId int, content string) error
 	GetCategoryByPostID(postID int) ([]models.Category, error)
 	GetAllCategories() ([]models.Category, error)
