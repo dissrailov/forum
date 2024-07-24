@@ -102,7 +102,6 @@ func (s *Sqlite) GetAllCategories() ([]models.Category, error) {
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
-	fmt.Println(categories)
 	return categories, nil
 }
 

@@ -71,7 +71,7 @@ func (h *HandlerApp) postCreateGet(w http.ResponseWriter, r *http.Request) {
 		h.ServerError(w, err)
 		return
 	}
-	data.Form = models.PostCreateForm{} // Очистка формы для предотвращения повторного заполнения данных
+	data.Form = models.PostCreateForm{}
 	data.Categories = &categories
 	h.Render(w, http.StatusOK, "create.tmpl", data)
 }
