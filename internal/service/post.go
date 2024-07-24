@@ -110,19 +110,3 @@ func (s *service) GetCommentByPostId(postId int) ([]models.Comment, error) {
 	}
 	return comment, nil
 }
-
-func (s *service) GetCategoryByPostID(postID int) ([]models.Category, error) {
-	category, err := s.repo.GetCategoryByPostID(postID)
-	if err != nil {
-		return nil, err
-	}
-	return category, nil
-}
-
-func (s *service) GetAllCategories() ([]models.Category, error) {
-	categories, err := s.repo.GetAllCategories()
-	if err != nil {
-		return nil, err
-	}
-	return categories, nil
-}

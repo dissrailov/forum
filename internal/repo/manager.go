@@ -13,6 +13,7 @@ type RepoI interface {
 	PostRepo
 	UserRepo
 	SessionRepo
+	Category
 }
 
 type PostRepo interface {
@@ -25,10 +26,14 @@ type PostRepo interface {
 	RemoveReaction(userID, postID int) error
 	AddComment(postId, userId int, content string) error
 	GetCommentByPostId(postId int) ([]models.Comment, error)
+}
+
+type Category interface {
 	AddCategory(postID int, category []int) error
 	CreateCategory(names []string) error
 	GetCategoryByPostID(postID int) ([]models.Category, error)
 	GetAllCategories() ([]models.Category, error)
+	GetPostByCategory(categoryID int) ([]models.Post, error)
 }
 
 type UserRepo interface {

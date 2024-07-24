@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"forum/internal/models"
 	"net/http"
+	"strconv"
 )
 
 func (h *HandlerApp) Home(w http.ResponseWriter, r *http.Request) {
@@ -9,7 +11,30 @@ func (h *HandlerApp) Home(w http.ResponseWriter, r *http.Request) {
 		h.NotFound(w)
 		return
 	}
-	posts, err := h.service.GetLastPost()
+
+	categoryIDStr := r.URL.Query().Get("category")
+
+	var categoryID int
+	var err error
+	if categoryIDStr != "" {
+		categoryID, err = strconv.Atoi(categoryIDStr)
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+	}
+	var posts []models.Post
+
+	if categoryID > 0 {
+		posts, err = h.service.GetPostByCategory(categoryID)
+	} else {
+		posts, err = h.service.GetLastPost()
+	}
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	categories, err := h.service.GetAllCategories()
 	if err != nil {
 		h.ServerError(w, err)
 		return
@@ -17,7 +42,10 @@ func (h *HandlerApp) Home(w http.ResponseWriter, r *http.Request) {
 	data, err := h.NewTemplateData(r)
 	if err != nil {
 		h.ServerError(w, err)
+		return
 	}
-	data.Posts = &posts // Присваиваем значение posts типа []models.Post
+	data.Posts = &posts
+	data.Categories = &categories
 	h.Render(w, http.StatusOK, "home.tmpl", data)
+
 }

@@ -29,6 +29,7 @@ type PostServiceI interface {
 	GetCategoryByPostID(postID int) ([]models.Category, error)
 	GetAllCategories() ([]models.Category, error)
 	GetCommentByPostId(postId int) ([]models.Comment, error)
+	GetPostByCategory(categoryID int) ([]models.Post, error)
 }
 
 type UserServiceI interface {

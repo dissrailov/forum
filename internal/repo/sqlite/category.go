@@ -105,3 +105,26 @@ func (s *Sqlite) GetAllCategories() ([]models.Category, error) {
 	fmt.Println(categories)
 	return categories, nil
 }
+
+func (s *Sqlite) GetPostByCategory(categoryID int) ([]models.Post, error) {
+	op := "sqlite.GetPostByCategory"
+	rows, err := s.DB.Query(`
+	SELECT p.id, p.title, p.content, p.user_id, p.created
+	FROM posts p
+	INNER JOIN post_category pc on p.id = pc.post_id
+	WHERE pc.category_id = ?`, categoryID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+	defer rows.Close()
+	var posts []models.Post
+	for rows.Next() {
+		var post models.Post
+		err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.Created)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
