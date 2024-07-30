@@ -16,6 +16,12 @@ func (h *HandlerApp) AccountView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	postCreated, err := h.service.GetPostId(userId.ID)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	postLiked,err ;= h.service
 	data, err := h.NewTemplateData(r)
 	if err != nil {
 		h.ServerError(w, err)

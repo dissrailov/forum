@@ -24,6 +24,7 @@ type PostRepo interface {
 	DislikePost(userID, postID int) error
 	GetUserReaction(userID, postID int) (int, error)
 	RemoveReaction(userID, postID int) error
+	GetLikedPostsByUserID(userID int) ([]models.Post, error)
 	AddComment(postId, userId int, content string) error
 	GetCommentByPostId(postId int) ([]models.Comment, error)
 }

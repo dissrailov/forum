@@ -22,5 +22,27 @@
             <td><a href="/account/password">Change password</a></td>
         </tr>
     </table>
-    {{end }}
+    {{end}}
+
+    <h3>Your Posts</h3>
+    {{if .Posts.Created}}
+    <ul>
+        {{range .Posts.Created}}
+        <li><a href="/posts/{{.ID}}">{{.Title}}</a> ({{humanDate .Created}})</li>
+        {{end}}
+    </ul>
+    {{else}}
+    <p>You have not created any posts.</p>
+    {{end}}
+
+    <h3>Liked Posts</h3>
+    {{if .Posts.Liked}}
+    <ul>
+        {{range .Posts.Liked}}
+        <li><a href="/posts/{{.ID}}">{{.Title}}</a> ({{humanDate .Created}})</li>
+        {{end}}
+    </ul>
+    {{else}}
+    <p>You have not liked any posts.</p>
+    {{end}}
 {{end}}

@@ -1,6 +1,9 @@
 package sqlite
 
-import "fmt"
+import (
+	"fmt"
+	"forum/internal/models"
+)
 
 func (s *Sqlite) GetUserReaction(userID, postID int) (int, error) {
 	op := "sqlite.GetUserReaction"
@@ -49,4 +52,34 @@ func (s *Sqlite) RemoveReaction(userID, postID int) error {
 		_, err = s.DB.Exec(`UPDATE posts SET dislikes = dislikes - 1 WHERE id = ?`, postID)
 	}
 	return nil
+}
+
+
+func (s *Sqlite) GetLikedPostsByUserID(userID int) ([]models.Post, error) {
+	// Получаем все посты из базы данных
+	rows, err := s.DB.Query("SELECT id, title, content, created FROM posts")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []models.Post
+	for rows.Next() {
+		var post models.Post
+		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.Created); err != nil {
+			return nil, err
+		}
+
+		// Проверяем, лайкнул ли пользователь этот пост
+		reaction, err := s.GetUserReaction(userID, post.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Если реакция пользователя равна 1 (например, лайк), добавляем пост в результат
+		if reaction == 1 {
+			posts = append(posts, post)
+		}
+	}
+	return posts, nil
 }
