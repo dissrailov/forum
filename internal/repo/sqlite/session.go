@@ -42,6 +42,5 @@ func (s *Sqlite) GetUserIDByToken(token string) (int, error) {
 	if err != nil {
 		return -1, fmt.Errorf("%s: %w", op, err)
 	}
-
 	return userID, nil
 }
