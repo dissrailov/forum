@@ -32,7 +32,6 @@ type PostServiceI interface {
 	GetAllCategories() ([]models.Category, error)
 	GetCommentByPostId(postId int) ([]models.Comment, error)
 	GetPostByCategory(categoryID int) ([]models.Post, error)
-	GetLikedPostsByUserID(userID int) ([]models.Post, error)
 }
 
 type UserServiceI interface {

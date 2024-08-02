@@ -98,13 +98,6 @@ func (s *service) LikePost(userID, postID int) error {
 	return nil
 }
 
-func (s *service) GetLikedPostsByUserID(userID int) ([]models.Post, error) {
-	reaction, err := s.repo.GetLikedPostsByUserID(userID)
-	if err != nil {
-		return nil, err
-	}
-	return reaction, nil
-}
 func (s *service) AddComment(postId, userId int, content string) error {
 	err := s.repo.AddComment(postId, userId, content)
 	return err

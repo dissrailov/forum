@@ -23,29 +23,6 @@
     </table>
     {{end}}
 
-<<<<<<< HEAD
-    <h3>Your Posts</h3>
-    {{if .Posts.Created}}
-    <ul>
-        {{range .Posts.Created}}
-        <li><a href="/posts/{{.ID}}">{{.Title}}</a> ({{humanDate .Created}})</li>
-        {{end}}
-    </ul>
-    {{else}}
-    <p>You have not created any posts.</p>
-    {{end}}
-
-    <h3>Liked Posts</h3>
-    {{if .Posts.Liked}}
-    <ul>
-        {{range .Posts.Liked}}
-        <li><a href="/posts/{{.ID}}">{{.Title}}</a> ({{humanDate .Created}})</li>
-        {{end}}
-    </ul>
-    {{else}}
-    <p>You have not liked any posts.</p>
-    {{end}}
-=======
     <h3>Created Posts</h3>
     {{if .UserPosts}}
     <ul>
@@ -68,5 +45,4 @@
 <p>No posts liked yet.</p>
 {{end}}
 
->>>>>>> 7aefd1b (Add liked,created posts in profile)
 {{end}}

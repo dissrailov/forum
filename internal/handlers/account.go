@@ -16,45 +16,24 @@ func (h *HandlerApp) AccountView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-<<<<<<< HEAD
-
-	postsCreated, err := h.service.GetPostId(userId.ID)
-=======
 	liked, err := h.service.GetLikedPosts(userId.ID)
->>>>>>> 7aefd1b (Add liked,created posts in profile)
 	if err != nil {
 		h.ServerError(w, err)
 		return
 	}
-<<<<<<< HEAD
-
-	postsLiked, err := h.service.GetLikedPostsByUserID(userId.ID)
-=======
 	posts, err := h.service.GetUserPosts(userId.ID)
->>>>>>> 7aefd1b (Add liked,created posts in profile)
 	if err != nil {
 		h.ServerError(w, err)
 		return
 	}
-<<<<<<< HEAD
-
-=======
->>>>>>> 7aefd1b (Add liked,created posts in profile)
 	data, err := h.NewTemplateData(r)
 	if err != nil {
 		h.ServerError(w, err)
 		return
 	}
-<<<<<<< HEAD
-
-=======
 	data.LikedPosts = &liked
 	data.UserPosts = &posts
->>>>>>> 7aefd1b (Add liked,created posts in profile)
 	data.User = userId
-	data.PostsCreated = postsCreated
-	data.PostsLiked = postsLiked
-
 	h.Render(w, http.StatusOK, "account.tmpl", data)
 }
 
