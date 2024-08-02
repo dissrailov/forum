@@ -11,4 +11,6 @@ type TemplateData struct {
 	Form            any
 	IsAuthenticated bool
 	User            *User
+	LikedPosts      *[]Post
+	UserPosts       *[]Post
 }

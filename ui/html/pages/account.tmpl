@@ -3,7 +3,7 @@
 {{define "main"}}
     <h2>Your Account</h2>
     {{with .User}}
-     <table>
+    <table>
         <tr>
             <th>Name</th>
             <td>{{.Name}}</td>
@@ -17,13 +17,13 @@
             <td>{{humanDate .Created}}</td>
         </tr>
         <tr>
-            <!-- Add a link to the change password form -->
             <th>Password</th>
             <td><a href="/account/password">Change password</a></td>
         </tr>
     </table>
     {{end}}
 
+<<<<<<< HEAD
     <h3>Your Posts</h3>
     {{if .Posts.Created}}
     <ul>
@@ -45,4 +45,28 @@
     {{else}}
     <p>You have not liked any posts.</p>
     {{end}}
+=======
+    <h3>Created Posts</h3>
+    {{if .UserPosts}}
+    <ul>
+        {{range .UserPosts}}
+        <li><a href="/post/view?id={{.ID}}">{{.Title}}</a> - {{humanDate .Created}}</li>
+        {{end}}
+    </ul>
+    {{else}}
+    <p>No posts created yet.</p>
+    {{end}}
+    
+<h3>Liked Posts</h3>
+{{if .LikedPosts}}
+<ul>
+    {{range .LikedPosts}}
+    <li><a href="/post/view?id={{.ID}}">{{.Title}}</a> - {{humanDate .Created}}</li>
+    {{end}}
+</ul>
+{{else}}
+<p>No posts liked yet.</p>
+{{end}}
+
+>>>>>>> 7aefd1b (Add liked,created posts in profile)
 {{end}}

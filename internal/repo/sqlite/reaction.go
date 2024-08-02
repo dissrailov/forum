@@ -54,12 +54,26 @@ func (s *Sqlite) RemoveReaction(userID, postID int) error {
 	return nil
 }
 
+<<<<<<< HEAD
 
 func (s *Sqlite) GetLikedPostsByUserID(userID int) ([]models.Post, error) {
 	// Получаем все посты из базы данных
 	rows, err := s.DB.Query("SELECT id, title, content, created FROM posts")
 	if err != nil {
 		return nil, err
+=======
+func (s *Sqlite) GetLikedPosts(userID int) ([]models.Post, error) {
+	op := "sqlite.GetLikedPosts"
+	query := `
+        SELECT p.id, p.title, p.content, p.created
+        FROM posts p
+        JOIN user_post_reactions upr ON p.id = upr.post_id
+        WHERE upr.user_id = ? AND upr.reaction = 1` // Предполагаем, что 1 - это лайк
+
+	rows, err := s.DB.Query(query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("%s : %w", op, err)
+>>>>>>> 7aefd1b (Add liked,created posts in profile)
 	}
 	defer rows.Close()
 
@@ -67,6 +81,7 @@ func (s *Sqlite) GetLikedPostsByUserID(userID int) ([]models.Post, error) {
 	for rows.Next() {
 		var post models.Post
 		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.Created); err != nil {
+<<<<<<< HEAD
 			return nil, err
 		}
 
@@ -80,6 +95,11 @@ func (s *Sqlite) GetLikedPostsByUserID(userID int) ([]models.Post, error) {
 		if reaction == 1 {
 			posts = append(posts, post)
 		}
+=======
+			return nil, fmt.Errorf("%s : %w", op, err)
+		}
+		posts = append(posts, post)
+>>>>>>> 7aefd1b (Add liked,created posts in profile)
 	}
 	return posts, nil
 }

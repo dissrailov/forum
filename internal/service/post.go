@@ -117,3 +117,19 @@ func (s *service) GetCommentByPostId(postId int) ([]models.Comment, error) {
 	}
 	return comment, nil
 }
+
+func (s *service) GetLikedPosts(userID int) ([]models.Post, error) {
+	liked, err := s.repo.GetLikedPosts(userID)
+	if err != nil {
+		return nil, err
+	}
+	return liked, nil
+}
+
+func (s *service) GetUserPosts(userID int) ([]models.Post, error) {
+	posts, err := s.repo.GetUserPosts(userID)
+	if err != nil {
+		return nil, err
+	}
+	return posts, nil
+}

@@ -42,6 +42,37 @@ func (s *Sqlite) GetPostId(id int) (*models.Post, error) {
 	return p, nil
 }
 
+func (s *Sqlite) GetUserPosts(userID int) ([]models.Post, error) {
+	op := "sqlite.GetUserPosts"
+	query := `
+        SELECT id, user_id, title, content, likes, dislikes, created
+        FROM posts
+        WHERE user_id = ?`
+	rows, err := s.DB.Query(query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("%s : %w", op, err)
+	}
+	defer rows.Close()
+
+	var posts []models.Post
+	for rows.Next() {
+		var post models.Post
+		if err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.Title,
+			&post.Content,
+			&post.Likes,
+			&post.Dislikes,
+			&post.Created,
+		); err != nil {
+			return nil, fmt.Errorf("%s : %w", op, err)
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
+
 func (s *Sqlite) GetLastPost() ([]models.Post, error) {
 	op := "sqlite.GetLastPost"
 
