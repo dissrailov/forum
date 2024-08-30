@@ -1,6 +1,8 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
+<div class="content-wrapper">
+    <div class="categories-container">
     <h2>Categories</h2>
     <div class="categories">
         {{range .Categories}}
@@ -9,9 +11,12 @@
             </form>
         {{end}}
     </div>
+    </div>
 
-    <h2>Latest Posts</h2>
+
     {{if .Posts}}
+    <div class="post-list-container">
+    <h2>Latest Posts</h2>
         <div class="post-list">
             {{range .Posts}}
                 <div class="post">
@@ -35,7 +40,9 @@
                 </div>
             {{end}}
         </div>
+    </div>
     {{else}}
         <p class="empty-message">There's nothing to see here... yet!</p>
     {{end}}
+</div>
 {{end}}
