@@ -20,7 +20,7 @@ type PostRepo interface {
 	CreatePost(title string, content string, userID int) (int, error)
 	GetPostId(id int) (*models.Post, error)
 	GetUserPosts(userID int) ([]models.Post, error)
-	GetLastPost() ([]models.Post, error)
+	GetAllPosts() ([]models.Post, error)
 	LikePost(userID, postID int) error
 	DislikePost(userID, postID int) error
 	GetLikedPosts(userID int) ([]models.Post, error)

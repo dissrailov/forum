@@ -48,8 +48,8 @@ func (s *service) GetPostId(id int) (*models.Post, error) {
 	return posts, nil
 }
 
-func (s *service) GetLastPost() ([]models.Post, error) {
-	posts, err := s.repo.GetLastPost()
+func (s *service) GetAllPosts() ([]models.Post, error) {
+	posts, err := s.repo.GetAllPosts()
 	if err != nil {
 		return nil, err
 	}

@@ -22,7 +22,7 @@ func NewService(repo repo.RepoI) ServiceI {
 type PostServiceI interface {
 	CreatePost(cookie string, form models.PostCreateForm, data *models.TemplateData) (*models.TemplateData, int, error)
 	GetPostId(id int) (*models.Post, error)
-	GetLastPost() ([]models.Post, error)
+	GetAllPosts() ([]models.Post, error)
 	DislikePost(userID, postID int) error
 	LikePost(userID, postID int) error
 	GetLikedPosts(userID int) ([]models.Post, error)

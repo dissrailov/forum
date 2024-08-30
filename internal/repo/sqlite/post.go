@@ -73,11 +73,11 @@ func (s *Sqlite) GetUserPosts(userID int) ([]models.Post, error) {
 	return posts, nil
 }
 
-func (s *Sqlite) GetLastPost() ([]models.Post, error) {
-	op := "sqlite.GetLastPost"
+func (s *Sqlite) GetAllPosts() ([]models.Post, error) {
+	op := "sqlite.GetAllPosts"
 
 	stmt := `SELECT id, title, content, likes, dislikes, created FROM posts
-    ORDER BY id DESC LIMIT 10`
+    ORDER BY id DESC`
 	rows, err := s.DB.Query(stmt)
 	if err != nil {
 		return nil, fmt.Errorf("%s : %w", op, err)
