@@ -26,12 +26,6 @@ type PostCreateForm struct {
 	validator.Validator `form:"-"`
 }
 
-type UserPostReaction struct {
-	UserID   int
-	PostID   int
-	Reaction int // 1 для лайка, -1 для дизлайка
-}
-
 type Comment struct {
 	ID       int
 	PostId   int

@@ -3,6 +3,7 @@ package service
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"forum/internal/models"
 	"forum/internal/pkg/validator"
 )
@@ -80,6 +81,7 @@ func (s *service) DislikePost(userID, postID int) error {
 
 func (s *service) LikePost(userID, postID int) error {
 	reaction, err := s.repo.GetUserReaction(userID, postID)
+	fmt.Println(reaction)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return err
 	}
