@@ -1,6 +1,8 @@
 package sqlite
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"forum/internal/models"
 )
@@ -40,6 +42,9 @@ func (s *Sqlite) GetUserIDByToken(token string) (int, error) {
 
 	err := s.DB.QueryRow(stmt, token).Scan(&userID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return -1, nil // Возвращаем nil, если сессия не найдена
+		}
 		return -1, fmt.Errorf("%s: %w", op, err)
 	}
 	return userID, nil

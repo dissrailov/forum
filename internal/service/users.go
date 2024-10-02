@@ -70,9 +70,9 @@ func (s *service) Authenticate(form *models.UserLoginForm, data *models.Template
 		}
 	}
 	session := models.NewSession(userId)
-	//if err = s.repo.DeleteSessionById(userId); err != nil {
-	//	return nil, nil, err
-	//}
+	if err = s.repo.DeleteSessionById(userId); err != nil {
+		return nil, nil, err
+	}
 	err = s.repo.CreateSession(session)
 	if err != nil {
 		return nil, nil, err

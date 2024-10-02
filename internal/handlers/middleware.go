@@ -60,6 +60,11 @@ func (h *HandlerApp) NewTemplateData(r *http.Request) (*models.TemplateData, err
 	if TemplateData.IsAuthenticated {
 		user, err := h.service.GetUser(r)
 		if err != nil {
+			if err == models.ErrNoRecord {
+				TemplateData.IsAuthenticated = false
+				TemplateData.User = nil
+				return &TemplateData, nil
+			}
 			return nil, err
 		}
 		TemplateData.User = user
