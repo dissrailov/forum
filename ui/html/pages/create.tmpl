@@ -1,7 +1,7 @@
 {{define "title"}}Create a New Post{{end}}
 
 {{define "main"}}
-<form action='/post/create' method='POST'>
+<form class="new-post-form" action='/post/create' method='POST'>
     <div>
         <label>Title:</label>
         {{with .Form.FieldErrors.Title}}

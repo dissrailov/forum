@@ -8,10 +8,10 @@ import (
 )
 
 func (s *service) CreatePost(cookie string, form models.PostCreateForm, data *models.TemplateData) (*models.TemplateData, int, error) {
-	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank")
-	form.CheckField(validator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 characters long")
-	form.CheckField(validator.NotBlank(form.Content), "content", "This field cannot be blank")
-	form.CheckField(validator.MaxChars(form.Content, 250), "content", "This field cannot be more than 250 characters long")
+	form.CheckField(validator.NotBlank(form.Title), "Title", "This field cannot be blank")
+	form.CheckField(validator.MaxChars(form.Title, 100), "Title", "This field cannot be more than 100 characters long")
+	form.CheckField(validator.NotBlank(form.Content), "Content", "This field cannot be blank")
+	form.CheckField(validator.MaxChars(form.Content, 250), "Content", "This field cannot be more than 250 characters long")
 
 	if !form.Valid() {
 		data.Form = form

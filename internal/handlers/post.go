@@ -24,6 +24,13 @@ func (h *HandlerApp) postCreatePost(w http.ResponseWriter, r *http.Request) {
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
+
+	categories, err := h.service.GetAllCategories()
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
 	categoryIDsStr := r.Form["categoryIDs[]"]
 	var categoryIDs []int
 	for _, idStr := range categoryIDsStr {
@@ -45,6 +52,8 @@ func (h *HandlerApp) postCreatePost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.ServerError(w, err)
 	}
+
+	data.Categories = &categories
 
 	data, id, err := h.service.CreatePost(cookies.Value, form, data)
 	if err != nil {

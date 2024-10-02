@@ -7,9 +7,11 @@
     <div class="categories">
         {{range .Categories}}
             <form method="get" action="/">
-                <button type="submit" name="category" value="{{.ID}}">{{.Name}}</button>
+                <button type="submit" name="category" value="{{.ID}}" 
+                class="{{if eq .ID $.SelectedCategoryID}}selected{{end}}">{{.Name}}</button>
             </form>
         {{end}}
+        <a href='/'>Clear</a>
     </div>
     </div>
 

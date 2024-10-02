@@ -50,6 +50,7 @@ func (h *HandlerApp) Home(w http.ResponseWriter, r *http.Request) {
 	}
 	data.Posts = &posts
 	data.Categories = &categories
+	data.SelectedCategoryID = categoryID
 
 	h.Render(w, http.StatusOK, "home.tmpl", data)
 }

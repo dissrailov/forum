@@ -30,7 +30,7 @@
     {{if .Comments}}
         {{range .Comments}}
         <div class="comment">
-            <p>{{.Content}}</p>
+            <pre><code>{{.Content}}</code></pre>
             <small>Posted by user {{.Username}} at {{humanDate .Created}}</small>
         </div>
         {{else}}

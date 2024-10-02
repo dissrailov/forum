@@ -37,7 +37,3 @@ func main() {
 	err = srv.ListenAndServe()
 	errorlog.Fatal(err)
 }
-
-//надо сделать
-//странички
-//в моем профиле были видны созданные посты
