@@ -11,6 +11,14 @@ body {
     padding: 20px;
 }
 
+a {
+    text-decoration: none;
+    list-style: none;
+    border: none;
+    color: inherit;
+}
+
+
 .content-wrapper {
     display: flex;
     justify-content: center; /* Center the content horizontally */
@@ -49,7 +57,11 @@ h2 {
 }
 
 .post p {
-    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4; /* Ограничение на количество строк */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .post .metadata {
@@ -90,6 +102,17 @@ h2 {
     text-decoration: underline;
 }
 
+.post h3, .post p {
+    word-wrap: break-word; /* Перенос длинных слов на новую строку */
+    overflow-wrap: break-word; /* Для совместимости с различными браузерами */
+    overflow: hidden; /* Скрыть текст, выходящий за границы блока */
+    text-overflow: ellipsis; /* Добавить многоточие, если текст слишком длинный (только для одного ряда) */
+}
+
+.post h3, .post p {
+    max-width: 100%;
+    white-space: pre-wrap; /* Предотвращает выход текста за границы, сохраняя переносы строк */
+}
 
 .likes-dislikes {
     display: flex;
@@ -173,82 +196,27 @@ h2 {
 }
 /* Account details styles */
 /* Styles for Your Account section */
-.account-details {
-    max-width: 600px; /* Максимальная ширина контейнера для улучшенного визуального восприятия */
-    margin: 20px auto; /* Центрирование блока по центру и добавление отступов */
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+
+.toggle-heading {
+    cursor: pointer;
+    color: #007bff;
+    text-decoration: underline;
 }
 
-.account-details h2 {
-    margin-top: 0;
-    color: #333;
+.toggle-heading:hover {
+    color: #0056b3;
 }
 
-.account-details table {
-    width: 100%;
-    border-collapse: collapse; /* Склеиваем границы ячеек таблицы */
-    margin-bottom: 15px;
-}
-
-.account-details th,
-.account-details td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd; /* Горизонтальная линия под ячейками */
-}
-
-.account-details th {
-    text-align: left;
-    color: #007bff; /* Цвет заголовков столбцов */
-}
-
-.account-details a {
+.user-post a {
     color: #007bff;
     text-decoration: none;
 }
 
-.account-details a:hover {
+.user-post a:hover {
     text-decoration: underline;
 }
 
-.account-details td {
-    color: #555; /* Цвет текста в ячейках */
-}
 
-
-.account-table {
-    margin-top: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.account-table th, .account-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.account-table th {
-    background-color: #f0f0f0;
-    color: #333;
-}
-
-.account-table td {
-    vertical-align: middle;
-}
-
-.account-table td a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.account-table td a:hover {
-    text-decoration: underline;
-}
 
 /* Create a New Post form styles */
 .new-post-form {
@@ -563,3 +531,5 @@ footer a {
 footer a:hover {
     text-decoration: underline;
 }
+
+
