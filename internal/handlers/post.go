@@ -75,6 +75,11 @@ func (h *HandlerApp) postCreateGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, err = h.service.GetUser(r)
+	if err != nil {
+		http.Redirect(w, r, fmt.Sprintln("/user/login"), http.StatusSeeOther)
+		return
+	}
 	categories, err := h.service.GetAllCategories()
 	if err != nil {
 		h.ServerError(w, err)
