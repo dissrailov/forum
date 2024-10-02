@@ -32,6 +32,18 @@
         <div class="comment">
             <pre><code>{{.Content}}</code></pre>
             <small>Posted by user {{.Username}} at {{humanDate .Created}}</small>
+            <div class="likes-dislikes">
+                        <form action="/post/comment/like" method="post" class="like-form">
+                                <input type="hidden" name="commentID" value="{{.ID}}">
+                                <button type="submit" class="like-button">Like</button>
+                                <span class="like-count">{{.Likes}}</span>
+                        </form>
+                        <form action="/post/comment/dislike" method="post" class="dislike-form">
+                                <input type="hidden" name="commentID" value="{{.ID}}">
+                                <button type="submit" class="dislike-button">Dislike</button>
+                                <span class="dislike-count">{{.Dislikes}}</span>
+                        </form>
+                </div>
         </div>
         {{else}}
         <p>No comments yet.</p>

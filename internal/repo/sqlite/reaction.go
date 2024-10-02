@@ -78,3 +78,52 @@ func (s *Sqlite) GetLikedPosts(userID int) ([]models.Post, error) {
 	}
 	return posts, nil
 }
+
+func (s *Sqlite) GetUserReactionComm(userID, commentID int) (int, error) {
+	op := "sqlite.GetUserReactionComm"
+	var reaction int
+	err := s.DB.QueryRow(`SELECT reaction FROM user_comment_reactions WHERE user_id = ? AND comment_id = ?`, userID, commentID).Scan(&reaction)
+	if err != nil {
+		return 0, fmt.Errorf("%s : %w", op, err)
+	}
+	return reaction, nil
+}
+
+func (s *Sqlite) LikeComment(userID, commentID int) error {
+	op := "sqlite.LikeComment"
+	_, err := s.DB.Exec(`INSERT INTO user_comment_reactions (user_id, comment_id, reaction) VALUES (?, ?, 1)`, userID, commentID)
+	if err != nil {
+		return fmt.Errorf("%s : %w", op, err)
+	}
+	_, err = s.DB.Exec(`UPDATE comments SET likes = likes + 1 WHERE id = ?`, commentID)
+	return err
+}
+
+func (s *Sqlite) DislikeComment(userID, commentID int) error {
+	op := "sqlite.DislikeComment"
+	_, err := s.DB.Exec(`INSERT INTO user_comment_reactions (user_id, comment_id, reaction) VALUES (?, ?, -1)`, userID, commentID)
+	if err != nil {
+		return fmt.Errorf("%s : %w", op, err)
+	}
+	_, err = s.DB.Exec(`UPDATE comments SET dislikes = dislikes + 1 WHERE id = ?`, commentID)
+	return err
+}
+
+func (s *Sqlite) RemoveReactionComm(userID, commentID int) error {
+	op := "sqlite.RemoveReactionComm"
+	var reaction int
+	err := s.DB.QueryRow(`SELECT reaction FROM user_comment_reactions WHERE user_id = ? AND comment_id = ?`, userID, commentID).Scan(&reaction)
+	if err != nil {
+		return fmt.Errorf("%s : %w", op, err)
+	}
+	_, err = s.DB.Exec(`DELETE FROM user_comment_reactions WHERE user_id = ? AND comment_id = ?`, userID, commentID)
+	if err != nil {
+		return fmt.Errorf("%s : %w", op, err)
+	}
+	if reaction == 1 {
+		_, err = s.DB.Exec(`UPDATE comments SET likes = likes - 1 WHERE id = ?`, commentID)
+	} else {
+		_, err = s.DB.Exec(`UPDATE comments SET dislikes = dislikes - 1 WHERE id = ?`, commentID)
+	}
+	return nil
+}

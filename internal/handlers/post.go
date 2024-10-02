@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"forum/internal/models"
 	"forum/internal/pkg/cookie"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -165,7 +164,6 @@ func (h *HandlerApp) DislikePost(w http.ResponseWriter, r *http.Request) {
 	postIDStr := r.FormValue("postID")
 	postID, err := strconv.Atoi(postIDStr)
 	if err != nil || postID < 1 {
-		log.Println(err)
 		h.NotFound(w)
 		return
 	}
@@ -204,4 +202,57 @@ func (h *HandlerApp) AddComment(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", postID), http.StatusSeeOther)
 	}
+}
+
+func (h *HandlerApp) LikeComment(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	commentIDStr := r.FormValue("commentID")
+	commentID, err := strconv.Atoi(commentIDStr)
+	if err != nil || commentID < 1 {
+		h.NotFound(w)
+		return
+	}
+
+	userID, err := h.service.GetUser(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
+
+	err = h.service.LikeComment(userID.ID, commentID)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, r.URL.Path, http.StatusSeeOther)
+}
+
+func (h *HandlerApp) DislikeComment(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	commentIDStr := r.FormValue("commentID")
+	commentID, err := strconv.Atoi(commentIDStr)
+	if err != nil || commentID < 1 {
+		h.NotFound(w)
+		return
+	}
+
+	userID, err := h.service.GetUser(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
+
+	err = h.service.DislikePost(userID.ID, commentID)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	http.Redirect(w, r, r.URL.Path, http.StatusSeeOther)
 }

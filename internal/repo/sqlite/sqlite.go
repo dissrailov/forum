@@ -42,6 +42,12 @@ func NewDB(dsn string) (*Sqlite, error) {
 			reaction INTEGER, -- 1 для лайка, -1 для дизлайка
 			PRIMARY KEY (user_id, post_id)
 		);`,
+		`CREATE TABLE IF NOT EXISTS user_comment_reactions (
+			user_id INTEGER,
+			comment_id INTEGER,
+			reaction INTEGER, -- 1 для лайка, -1 для дизлайка
+			PRIMARY KEY (user_id, comment_id)
+		);`,
 		`CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
   		name TEXT NOT NULL,
@@ -55,6 +61,8 @@ func NewDB(dsn string) (*Sqlite, error) {
     post_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     content TEXT NOT NULL,
+	likes INTEGER DEFAULT 0,
+    dislikes INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (user_id) REFERENCES users(id)

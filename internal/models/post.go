@@ -19,10 +19,10 @@ type Post struct {
 }
 
 type PostCreateForm struct {
-	Title       string
-	Content     string
-	CategoryIDs []int
-	Category    []string
+	Title               string
+	Content             string
+	CategoryIDs         []int
+	Category            []string
 	validator.Validator `form:"-"`
 }
 
@@ -39,4 +39,6 @@ type Comment struct {
 	Username string
 	Content  string
 	Created  time.Time
+	Likes    int
+	Dislikes int
 }

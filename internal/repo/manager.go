@@ -28,6 +28,10 @@ type PostRepo interface {
 	RemoveReaction(userID, postID int) error
 	AddComment(postId, userId int, content string) error
 	GetCommentByPostId(postId int) ([]models.Comment, error)
+	LikeComment(userID, commentID int) error
+	DislikeComment(userID, commentID int) error
+	RemoveReactionComm(userID, commentID int) error
+	GetUserReactionComm(userID, commentID int) (int, error)
 }
 
 type Category interface {

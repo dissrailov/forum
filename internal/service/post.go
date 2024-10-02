@@ -126,3 +126,44 @@ func (s *service) GetUserPosts(userID int) ([]models.Post, error) {
 	}
 	return posts, nil
 }
+
+func (s *service) DislikeComment(userID, commentID int) error {
+	reaction, err := s.repo.GetUserReactionComm(userID, commentID)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return err
+	}
+
+	if reaction == 1 || reaction == -1 {
+		if err := s.repo.RemoveReactionComm(userID, commentID); err != nil {
+			return err
+		}
+	}
+
+	if reaction != -1 {
+		if err := s.repo.DislikeComment(userID, commentID); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *service) LikeComment(userID, commentID int) error {
+	reaction, err := s.repo.GetUserReactionComm(userID, commentID)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return err
+	}
+
+	if reaction == 1 || reaction == -1 {
+		if err := s.repo.RemoveReactionComm(userID, commentID); err != nil {
+			return err
+		}
+	}
+
+	if reaction != 1 {
+		if err := s.repo.LikeComment(userID, commentID); err != nil {
+			return err
+		}
+	}
+	return nil
+}
