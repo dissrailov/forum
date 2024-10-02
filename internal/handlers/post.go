@@ -130,13 +130,15 @@ func (h *HandlerApp) LikePost(w http.ResponseWriter, r *http.Request) {
 	postIDStr := r.FormValue("postID")
 	postID, err := strconv.Atoi(postIDStr)
 	if err != nil || postID < 1 {
-		log.Println(err)
 		h.NotFound(w)
 		return
 	}
 
 	userID, err := h.service.GetUser(r)
 	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+		}
 		h.ServerError(w, err)
 	}
 
