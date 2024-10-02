@@ -114,7 +114,7 @@ func (s *Sqlite) GetCommentByPostId(postId int) ([]models.Comment, error) {
 	op := "sqlite.GetCommentByPostId"
 
 	query := `
-        SELECT c.id, c.post_id, c.user_id, u.name, c.content, c.created_at
+        SELECT c.id, c.post_id, c.user_id, u.name, c.content, c.created_at, c.likes, c.dislikes
         FROM comments c
         JOIN users u ON c.user_id = u.id
         WHERE c.post_id = ?
@@ -127,7 +127,7 @@ func (s *Sqlite) GetCommentByPostId(postId int) ([]models.Comment, error) {
 	var comments []models.Comment
 	for rows.Next() {
 		var comment models.Comment
-		err := rows.Scan(&comment.ID, &comment.PostId, &comment.UserId, &comment.Username, &comment.Content, &comment.Created)
+		err := rows.Scan(&comment.ID, &comment.PostId, &comment.UserId, &comment.Username, &comment.Content, &comment.Created, &comment.Likes, &comment.Dislikes)
 		if err != nil {
 			return nil, fmt.Errorf("%s : %w", op, err)
 		}
