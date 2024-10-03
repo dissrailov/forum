@@ -209,6 +209,12 @@ func (h *HandlerApp) LikeComment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
+	postIDStr := r.FormValue("postID")
+	postID, err := strconv.Atoi(postIDStr)
+	if err != nil || postID < 1 {
+		h.NotFound(w)
+		return
+	}
 	commentIDStr := r.FormValue("commentID")
 	commentID, err := strconv.Atoi(commentIDStr)
 	if err != nil || commentID < 1 {
@@ -226,13 +232,19 @@ func (h *HandlerApp) LikeComment(w http.ResponseWriter, r *http.Request) {
 		h.ServerError(w, err)
 		return
 	}
-	postID := 47
+
 	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", postID), http.StatusSeeOther)
 }
 
 func (h *HandlerApp) DislikeComment(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	postIDStr := r.FormValue("postID")
+	postID, err := strconv.Atoi(postIDStr)
+	if err != nil || postID < 1 {
+		h.NotFound(w)
 		return
 	}
 
@@ -253,6 +265,6 @@ func (h *HandlerApp) DislikeComment(w http.ResponseWriter, r *http.Request) {
 		h.ServerError(w, err)
 		return
 	}
-	postID := 47
+
 	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", postID), http.StatusSeeOther)
 }
