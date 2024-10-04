@@ -153,7 +153,13 @@ func (h *HandlerApp) LikePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	if r.FormValue("fromPostView") == "true" {
+		// Redirect back to the post view page
+		http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", postID), http.StatusSeeOther)
+	} else {
+		// Otherwise, redirect to the home page
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
 }
 
 func (h *HandlerApp) DislikePost(w http.ResponseWriter, r *http.Request) {
@@ -179,7 +185,12 @@ func (h *HandlerApp) DislikePost(w http.ResponseWriter, r *http.Request) {
 		h.ServerError(w, err)
 		return
 	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+
+	if r.FormValue("fromPostView") == "true" {
+		http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", postID), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
 }
 
 func (h *HandlerApp) AddComment(w http.ResponseWriter, r *http.Request) {

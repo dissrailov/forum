@@ -23,6 +23,20 @@
                 <span>No categories</span>
             {{end}}
         </div>
+        <div class="likes-dislikes">
+            <form action="/post/like" method="post" class="like-form">
+                <input type="hidden" name="postID" value="{{.ID}}">
+                <input type="hidden" name="fromPostView" value="true">
+                <button type="submit" class="like-button">Like</button>
+                <span class="like-count">{{.Likes}}</span>
+            </form>
+            <form action="/post/dislike" method="post" class="dislike-form">
+                <input type="hidden" name="postID" value="{{.ID}}">
+                <input type="hidden" name="fromPostView" value="true">
+                <button type="submit" class="dislike-button">Dislike</button>
+                <span class="dislike-count">{{.Dislikes}}</span>
+            </form>
+        </div>
     </div>
     {{end}}
 
@@ -47,9 +61,9 @@
                 </form>
             </div>
         </div>
-        {{else}}
-        <p>No comments yet.</p>
         {{end}}
+    {{else}}
+        <p>No comments yet.</p>
     {{end}}
 
     <h3>Add a Comment</h3>
@@ -59,7 +73,6 @@
         {{with .Form.FieldErrors.Content}}
             <label class='error'>{{.}}</label>
         {{end}}
-        <!-- Re-populate the content data as the inner HTML of the textarea. -->
         <textarea name='content'>{{.Form.Content}}</textarea>
         <button type="submit">Add Comment</button>
     </form>

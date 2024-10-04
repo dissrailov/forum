@@ -11,9 +11,53 @@ body {
     padding: 20px;
 }
 
+a {
+    text-decoration: none;
+    list-style: none;
+    border: none;
+    color: inherit;
+}
+
+
+.content-wrapper {
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+    gap: 20px; /* Add space between categories and post list */
+}
+
 h2 {
     color: #333;
+    justify-content: center;
 }
+
+.forum-header h1 {
+    display: flex;
+    align-items: center; /* Aligns image and text vertically */
+    font-size: 2rem;
+}
+
+.forum-logo {
+    width: 40px; /* Adjust the size of the logo as needed */
+    height: auto;
+    margin-right: 10px; /* Adds some space between the image and the text */
+    vertical-align: middle;
+}
+
+.forum-header a {
+    text-decoration: none;
+    color: black; /* Make sure the title's color is appropriate */
+}
+
+
+.post-list-container {
+    flex: 1; /* Allow the post list to take up the remaining space */
+}
+
+.post-list-container h2 {
+    text-align: center; /* Center the text */
+    margin-bottom: 20px; /* Optional: Add space below the header */
+}
+
 .post-list {
     margin: 20px auto; /* Центрируем блок по горизонтали и добавляем отступы сверху и снизу */
     max-width: 800px; /* Максимальная ширина блока, чтобы содержимое не было слишком широким на больших экранах */
@@ -32,7 +76,11 @@ h2 {
 }
 
 .post p {
-    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4; /* Ограничение на количество строк */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .post .metadata {
@@ -73,6 +121,17 @@ h2 {
     text-decoration: underline;
 }
 
+.post h3, .post p {
+    word-wrap: break-word; /* Перенос длинных слов на новую строку */
+    overflow-wrap: break-word; /* Для совместимости с различными браузерами */
+    overflow: hidden; /* Скрыть текст, выходящий за границы блока */
+    text-overflow: ellipsis; /* Добавить многоточие, если текст слишком длинный (только для одного ряда) */
+}
+
+.post h3, .post p {
+    max-width: 100%;
+    white-space: pre-wrap; /* Предотвращает выход текста за границы, сохраняя переносы строк */
+}
 
 .likes-dislikes {
     display: flex;
@@ -86,7 +145,7 @@ h2 {
 }
 
 .like-button, .dislike-button {
-    background-color: #007bff;
+    background-color: #0077ff;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -95,91 +154,88 @@ h2 {
 }
 
 .like-button:hover, .dislike-button:hover {
-    background-color: #0056b3;
+    background-color: #0077ff;
 }
 
 .like-count, .dislike-count {
     margin-left: 5px;
     font-weight: bold;
 }
+
+/* Categories Section */
+.categories-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.categories {
+    position: sticky;
+    top: 0;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 1000;
+}
+
+.categories h2 {
+    margin-bottom: 10px;
+}
+
+.categories form {
+    flex: 1;
+}
+
+.categories button {
+    background-color: #6200ea;
+    color: white;
+    border: none;
+    padding: 8px 15px; /* Adjusted padding for smaller buttons */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 4px; /* Slightly rounded corners */
+}
+
+.categories button.selected {
+    background-color: #031191;
+}
+
+.categories a {
+    color: #6200ea;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+.categories a:hover {
+    background-color: #ded5eb;
+}
+
+.categories button:hover {
+    background-color: #3700b3;
+}
 /* Account details styles */
 /* Styles for Your Account section */
-.account-details {
-    max-width: 600px; /* Максимальная ширина контейнера для улучшенного визуального восприятия */
-    margin: 20px auto; /* Центрирование блока по центру и добавление отступов */
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+
+.toggle-heading {
+    cursor: pointer;
+    color: #007bff;
+    text-decoration: underline;
 }
 
-.account-details h2 {
-    margin-top: 0;
-    color: #333;
+.toggle-heading:hover {
+    color: #0056b3;
 }
 
-.account-details table {
-    width: 100%;
-    border-collapse: collapse; /* Склеиваем границы ячеек таблицы */
-    margin-bottom: 15px;
-}
-
-.account-details th,
-.account-details td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd; /* Горизонтальная линия под ячейками */
-}
-
-.account-details th {
-    text-align: left;
-    color: #007bff; /* Цвет заголовков столбцов */
-}
-
-.account-details a {
+.user-post a {
     color: #007bff;
     text-decoration: none;
 }
 
-.account-details a:hover {
+.user-post a:hover {
     text-decoration: underline;
 }
 
-.account-details td {
-    color: #555; /* Цвет текста в ячейках */
-}
 
-
-.account-table {
-    margin-top: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.account-table th, .account-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.account-table th {
-    background-color: #f0f0f0;
-    color: #333;
-}
-
-.account-table td {
-    vertical-align: middle;
-}
-
-.account-table td a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.account-table td a:hover {
-    text-decoration: underline;
-}
 
 /* Create a New Post form styles */
 .new-post-form {
@@ -229,26 +285,30 @@ h2 {
 
 /* Login form styles */
 .login-form {
-    margin-top: 20px;
+    width: 300px;               /* Set width for the form */
+    margin: 100px auto;          /* Center the form horizontally and add top margin */
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
+    text-align: center;          /* Center the content inside the form */
 }
 
 .login-form label {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
+    text-align: left;           /* Align labels to the left */
 }
 
-.login-form input[type='email'],
-.login-form input[type='password'] {
-    width: 100%;
-    padding: 8px;
+input[type='email'],
+input[type='password'] {
+    width: 90%;                /* Full width inputs */
+    padding: 12px;              /* Larger padding for bigger fields */
     margin-bottom: 12px;
-    border: 1px solid #ddd;
+    border: 2px solid #007bff;  /* Blue frames for input fields */
     border-radius: 4px;
+    font-size: 16px;            /* Larger text inside input fields */
 }
 
 .login-form .error {
@@ -260,8 +320,9 @@ h2 {
     background-color: #007bff;
     color: #fff;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 20px;
     border-radius: 4px;
+    font-size: 16px;
     cursor: pointer;
 }
 
@@ -269,30 +330,36 @@ h2 {
     background-color: #0056b3;
 }
 
+
 /* Signup form styles */
 .signup-form {
-    margin-top: 20px;
+    width: 300px;               /* Set width for the form */
+    margin: 100px auto;          /* Center the form horizontally and add top margin */
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
+    text-align: center; 
 }
 
 .signup-form label {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
+    text-align: left; 
 }
 
 .signup-form input[type='text'],
 .signup-form input[type='email'],
 .signup-form input[type='password'] {
-    width: 100%;
-    padding: 8px;
+    width: 90%;                /* Full width inputs */
+    padding: 12px;              /* Larger padding for bigger fields */
     margin-bottom: 12px;
-    border: 1px solid #ddd;
+    border: 2px solid #007bff;  /* Blue frames for input fields */
     border-radius: 4px;
+    font-size: 16px;            /* Larger text inside input fields */
 }
+
 
 .signup-form .error {
     color: #dc3545;
@@ -303,97 +370,13 @@ h2 {
     background-color: #007bff;
     color: #fff;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 20px;
     border-radius: 4px;
+    font-size: 16px;
     cursor: pointer;
 }
 
 .signup-form input[type='submit']:hover {
-    background-color: #0056b3;
-}
-
-/* Post details styles */
-.post-details {
-    margin-top: 20px;
-}
-
-.post-details .snippet {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.post-details .snippet .metadata {
-    margin-bottom: 10px;
-}
-
-.post-details .snippet .metadata strong {
-    font-size: 1.2em;
-    color: #333;
-}
-
-.post-details .snippet .metadata span {
-    margin-left: 10px;
-    color: #888;
-}
-
-.post-details .snippet pre code {
-    display: block;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-    overflow-x: auto;
-    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-}
-
-.post-details .snippet .metadata time {
-    margin-right: 10px;
-    color: #555;
-}
-
-.post-details .comments {
-    margin-top: 20px;
-}
-
-.post-details .comments .comment {
-    background-color: #f0f0f0;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-}
-
-.post-details .comments .comment p {
-    margin-bottom: 5px;
-}
-
-.post-details .comments .comment small {
-    color: #777;
-}
-
-.post-details .add-comment-form {
-    margin-top: 20px;
-}
-
-.post-details .add-comment-form textarea {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.post-details .add-comment-form button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.post-details .add-comment-form button:hover {
     background-color: #0056b3;
 }
 
@@ -467,7 +450,11 @@ footer {
     text-align: center;
     position: fixed;
     bottom: 0;
-    width: 100%;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: fit-content; /* Adjust width to fit the content */
+    border-radius: 8px;
 }
 
 footer a {
@@ -477,4 +464,286 @@ footer a {
 
 footer a:hover {
     text-decoration: underline;
+}
+
+/* Account page container */
+.account-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styling */
+.account-container h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+/* Table styles for account info */
+.account-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.account-info-table th, 
+.account-info-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.account-info-table th {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+.account-info-table td {
+    background-color: #f9f9f9;
+}
+
+/* Toggle heading for sections */
+.toggle-heading {
+    font-size: 1.5rem;
+    color: #007bff;
+    cursor: pointer;
+    margin: 20px 0;
+}
+
+.toggle-heading:hover {
+    text-decoration: underline;
+}
+
+/* Styling for posts lists */
+.toggle-section {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 20px;
+}
+
+.user-post {
+    margin: 10px 0;
+}
+
+.user-post a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.user-post a:hover {
+    text-decoration: underline;
+}
+
+/* Password change link */
+.password-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.password-link:hover {
+    text-decoration: underline;
+}
+
+/* Styling the list of posts */
+.post-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+/* Each post item */
+.user-post {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.user-post:last-child {
+    border-bottom: none;
+}
+
+/* No posts text */
+.no-posts {
+    text-align: center;
+    padding: 10px;
+    font-style: italic;
+    color: #999;
+}
+
+/* Post title and date in two columns */
+.post-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Post title styling */
+.post-title {
+    font-size: 1.1rem;
+    color: #007bff;
+}
+
+.post-title a {
+    text-decoration: none;
+}
+
+.post-title a:hover {
+    text-decoration: underline;
+}
+
+/* Post date styling */
+.post-date {
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+}
+
+/* Hover effect for post items */
+.user-post:hover {
+    background-color: #f1f1f1;
+}
+
+/* Heading for toggle sections */
+.toggle-heading {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000; /* Make the text black */
+    text-align: center; /* Center the heading */
+    margin: 20px 0;
+    cursor: pointer;
+}
+
+.toggle-heading:hover {
+    text-decoration: none;
+}
+
+/* Post container styling */
+.snippet {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Post title styling */
+.snippet .metadata strong {
+    font-size: 1.8rem;
+    display: block;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Post content styling */
+.snippet pre code {
+    background-color: #f4f4f4;
+    padding: 10px;
+    display: block;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    margin: 15px 0;
+}
+
+/* Post metadata styling */
+.snippet .metadata {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.snippet .metadata span {
+    background-color: #007bff;
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    margin-right: 5px;
+}
+
+/* Like/Dislike button styling */
+.likes-dislikes {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.like-form, .dislike-form {
+    margin-right: 15px;
+}
+
+.like-button, .dislike-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.like-button:hover, .dislike-button:hover {
+    background-color: #0056b3;
+}
+
+.like-count, .dislike-count {
+    margin-left: 5px;
+    font-size: 0.9rem;
+}
+
+/* Comments section styling */
+.comment {
+    background-color: #f1f1f1;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.comment pre code {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Add Comment form */
+form textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+form button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+/* Headers for comments section */
+h2, h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #333;
 }

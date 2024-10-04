@@ -59,3 +59,8 @@ The objective of this project is to create a web forum that facilitates communic
 
 and click on the link "http://localhost:8080/"
 
+## Made by
+
+disrailov, saskarov, rust333m
+
+

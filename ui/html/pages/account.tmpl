@@ -26,25 +26,35 @@
     {{end}}
 
     <h3 class="toggle-heading" onclick="toggleSection('created-posts')">Created Posts</h3>
-    <ul id="created-posts" class="toggle-section">
-        {{if .UserPosts}}
-            {{range .UserPosts}}
-            <li class="user-post"><a href="/post/view?id={{.ID}}">{{.Title}}</a> - {{humanDate .Created}}</li>
-            {{end}}
-        {{else}}
-            <li>No posts created yet.</li>
+<ul id="created-posts" class="toggle-section post-list">
+    {{if .UserPosts}}
+        {{range .UserPosts}}
+        <li class="user-post">
+            <div class="post-info">
+                <span class="post-title"><a href="/post/view?id={{.ID}}">{{.Title}}</a></span>
+                <span class="post-date">{{humanDate .Created}}</span>
+            </div>
+        </li>
         {{end}}
-    </ul>
-    
-    <h3 class="toggle-heading" onclick="toggleSection('liked-posts')">Liked Posts</h3>
-    <ul id="liked-posts" class="toggle-section">
-        {{if .LikedPosts}}
-            {{range .LikedPosts}}
-            <li class="user-post"><a href="/post/view?id={{.ID}}">{{.Title}}</a> - {{humanDate .Created}}</li>
-            {{end}}
-        {{else}}
-            <li>No posts liked yet.</li>
+    {{else}}
+        <li class="no-posts">No posts created yet.</li>
+    {{end}}
+</ul>
+
+<h3 class="toggle-heading" onclick="toggleSection('liked-posts')">Liked Posts</h3>
+<ul id="liked-posts" class="toggle-section post-list">
+    {{if .LikedPosts}}
+        {{range .LikedPosts}}
+        <li class="user-post">
+            <div class="post-info">
+                <span class="post-title"><a href="/post/view?id={{.ID}}">{{.Title}}</a></span>
+                <span class="post-date">{{humanDate .Created}}</span>
+            </div>
+        </li>
         {{end}}
-    </ul>
+    {{else}}
+        <li class="no-posts">No posts liked yet.</li>
+    {{end}}
+</ul>
 </div>
 {{end}}
