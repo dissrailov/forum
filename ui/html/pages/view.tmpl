@@ -55,7 +55,12 @@
     <h3>Add a Comment</h3>
     <form action="/post/comment" method="post">
         <input type="hidden" name="PostId" value="{{.Post.ID}}">
-        <textarea name="Content" required></textarea>
+        <label>Content:</label>
+        {{with .Form.FieldErrors.Content}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        <!-- Re-populate the content data as the inner HTML of the textarea. -->
+        <textarea name='content'>{{.Form.Content}}</textarea>
         <button type="submit">Add Comment</button>
     </form>
 {{end}}

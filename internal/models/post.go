@@ -26,6 +26,14 @@ type PostCreateForm struct {
 	validator.Validator `form:"-"`
 }
 
+type CommentForm struct {
+	PostID  int
+	UserID  int
+	Content string
+	Token   string
+	validator.Validator
+}
+
 type Comment struct {
 	ID       int
 	PostId   int

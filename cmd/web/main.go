@@ -28,9 +28,9 @@ func main() {
 	app := app.New(infolog, errorlog, templateCache)
 	handlers := handlers.New(service, app)
 
-	infolog.Println("Server is running on :http://localhost:8080")
+	infolog.Println("Server is running on :http://localhost:8081")
 	srv := &http.Server{
-		Addr:     ":8080",
+		Addr:     ":8081",
 		ErrorLog: app.ErrorLog,
 		Handler:  handlers.Routes(),
 	}

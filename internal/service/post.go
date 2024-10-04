@@ -100,9 +100,18 @@ func (s *service) LikePost(userID, postID int) error {
 	return nil
 }
 
-func (s *service) AddComment(postId, userId int, content string) error {
-	err := s.repo.AddComment(postId, userId, content)
-	return err
+func (s *service) AddComment(data *models.TemplateData, form models.CommentForm, postID int, userId int, content string) (*models.TemplateData, error) {
+	form.CheckField(validator.NotBlank(form.Content), "Content", "This field cannot be blank")
+	form.CheckField(validator.MaxChars(form.Content, 100), "Content", "This field cannot be more than 100 characters long")
+
+	if !form.Valid() {
+		data.Form = form
+		return data, models.ErrNotValidPostForm
+	}
+
+	data.Form = form
+	err := s.repo.AddComment(postID, userId, form.Content)
+	return data, err
 }
 
 func (s *service) GetCommentByPostId(postId int) ([]models.Comment, error) {

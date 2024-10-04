@@ -122,6 +122,7 @@ func (h *HandlerApp) postView(w http.ResponseWriter, r *http.Request) {
 	data.Post = post
 	data.Comments = &comments
 	data.Categories = &categories
+	data.Form = models.CommentForm{}
 	h.Render(w, http.StatusOK, "view.tmpl", data)
 }
 
@@ -195,11 +196,45 @@ func (h *HandlerApp) AddComment(w http.ResponseWriter, r *http.Request) {
 			h.ServerError(w, err)
 			return
 		}
-		err = h.service.AddComment(postID, userID.ID, content)
+
+		data, err := h.NewTemplateData(r)
 		if err != nil {
-			http.Error(w, "Unable to add comment", http.StatusInternalServerError)
+			h.ServerError(w, err)
 			return
 		}
+		form := models.CommentForm{
+			Content: r.PostForm.Get("content"),
+		}
+
+		comments, err := h.service.GetCommentByPostId(postID)
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		post, err := h.service.GetPostId(postID)
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		data.Post = post
+		data.Comments = &comments
+		data, err = h.service.AddComment(data, form, postID, userID.ID, content)
+		if err != nil {
+			if err == models.ErrNotValidPostForm {
+				post, err := h.service.GetPostId(postID)
+				if err != nil {
+					h.ServerError(w, err)
+					return
+				}
+				data.Post = post
+				h.Render(w, http.StatusBadRequest, "view.tmpl", data)
+				return
+			} else {
+				h.ServerError(w, err)
+				return
+			}
+		}
+
 		http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", postID), http.StatusSeeOther)
 	}
 }
