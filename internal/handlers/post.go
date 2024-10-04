@@ -191,11 +191,6 @@ func (h *HandlerApp) AddComment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		userID, err := h.service.GetUser(r)
-		content := r.FormValue("Content")
-		if err != nil {
-			h.ServerError(w, err)
-			return
-		}
 
 		data, err := h.NewTemplateData(r)
 		if err != nil {
@@ -218,7 +213,7 @@ func (h *HandlerApp) AddComment(w http.ResponseWriter, r *http.Request) {
 		}
 		data.Post = post
 		data.Comments = &comments
-		data, err = h.service.AddComment(data, form, postID, userID.ID, content)
+		data, err = h.service.AddComment(data, form, postID, userID.ID)
 		if err != nil {
 			if err == models.ErrNotValidPostForm {
 				post, err := h.service.GetPostId(postID)

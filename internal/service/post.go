@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"forum/internal/models"
 	"forum/internal/pkg/validator"
+	"strings"
 )
 
 func (s *service) CreatePost(cookie string, form models.PostCreateForm, data *models.TemplateData) (*models.TemplateData, int, error) {
@@ -100,9 +101,10 @@ func (s *service) LikePost(userID, postID int) error {
 	return nil
 }
 
-func (s *service) AddComment(data *models.TemplateData, form models.CommentForm, postID int, userId int, content string) (*models.TemplateData, error) {
+func (s *service) AddComment(data *models.TemplateData, form models.CommentForm, postID int, userId int) (*models.TemplateData, error) {
 	form.CheckField(validator.NotBlank(form.Content), "Content", "This field cannot be blank")
 	form.CheckField(validator.MaxChars(form.Content, 100), "Content", "This field cannot be more than 100 characters long")
+	content := strings.TrimSpace(form.Content)
 
 	if !form.Valid() {
 		data.Form = form
@@ -110,7 +112,7 @@ func (s *service) AddComment(data *models.TemplateData, form models.CommentForm,
 	}
 
 	data.Form = form
-	err := s.repo.AddComment(postID, userId, form.Content)
+	err := s.repo.AddComment(postID, userId, content)
 	return data, err
 }
 

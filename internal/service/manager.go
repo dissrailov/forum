@@ -27,7 +27,7 @@ type PostServiceI interface {
 	LikePost(userID, postID int) error
 	GetLikedPosts(userID int) ([]models.Post, error)
 	GetUserPosts(userID int) ([]models.Post, error)
-	AddComment(data *models.TemplateData, form models.CommentForm, postID int, userId int, content string) (*models.TemplateData, error)
+	AddComment(data *models.TemplateData, form models.CommentForm, postID int, userId int) (*models.TemplateData, error)
 	GetCategoryByPostID(postID int) ([]models.Category, error)
 	GetAllCategories() ([]models.Category, error)
 	GetCommentByPostId(postId int) ([]models.Comment, error)
