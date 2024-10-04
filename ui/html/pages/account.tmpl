@@ -1,9 +1,11 @@
 {{define "title"}}Your Account{{end}}
 
 {{define "main"}}
+<div class="account-container">
     <h2>Your Account</h2>
+    
     {{with .User}}
-    <table>
+    <table class="account-info-table">
         <tr>
             <th>Name</th>
             <td>{{.Name}}</td>
@@ -18,31 +20,31 @@
         </tr>
         <tr>
             <th>Password</th>
-            <td><a href="/account/password">Change password</a></td>
+            <td><a href="/account/password" class="password-link">Change password</a></td>
         </tr>
     </table>
     {{end}}
 
     <h3 class="toggle-heading" onclick="toggleSection('created-posts')">Created Posts</h3>
-    <ul id="created-posts" class="toggle-section" style="display:none;">
+    <ul id="created-posts" class="toggle-section">
         {{if .UserPosts}}
             {{range .UserPosts}}
             <li class="user-post"><a href="/post/view?id={{.ID}}">{{.Title}}</a> - {{humanDate .Created}}</li>
             {{end}}
         {{else}}
-            <p>No posts created yet.</p>
+            <li>No posts created yet.</li>
         {{end}}
     </ul>
     
     <h3 class="toggle-heading" onclick="toggleSection('liked-posts')">Liked Posts</h3>
-    <ul id="liked-posts" class="toggle-section" style="display:none;">
+    <ul id="liked-posts" class="toggle-section">
         {{if .LikedPosts}}
             {{range .LikedPosts}}
             <li class="user-post"><a href="/post/view?id={{.ID}}">{{.Title}}</a> - {{humanDate .Created}}</li>
             {{end}}
         {{else}}
-            <p>No posts liked yet.</p>
+            <li>No posts liked yet.</li>
         {{end}}
     </ul>
-
+</div>
 {{end}}

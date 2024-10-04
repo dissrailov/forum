@@ -25,7 +25,10 @@ func (s *service) CreatePost(cookie string, form models.PostCreateForm, data *mo
 		return nil, 0, err
 	}
 
-	postID, err := s.repo.CreatePost(form.Title, form.Content, userID)
+	title := strings.TrimSpace(form.Title)
+	content := strings.TrimSpace(form.Content)
+
+	postID, err := s.repo.CreatePost(title, content, userID)
 	if err != nil {
 		return nil, 0, err
 	}
