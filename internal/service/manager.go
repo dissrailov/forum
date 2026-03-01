@@ -34,6 +34,7 @@ type PostServiceI interface {
 	GetPostByCategory(categoryID int) ([]models.Post, error)
 	DislikeComment(userID, commentsID int) error
 	LikeComment(userID, commentID int) error
+	GetAIResponse(postID int) (*models.AIResponse, error)
 }
 
 type UserServiceI interface {

@@ -14,10 +14,16 @@ type RepoI interface {
 	UserRepo
 	SessionRepo
 	Category
+	AIResponseRepo
+}
+
+type AIResponseRepo interface {
+	CreateAIResponse(postID int, content string, similarPostsJSON string) error
+	GetAIResponseByPostID(postID int) (*models.AIResponse, error)
 }
 
 type PostRepo interface {
-	CreatePost(title string, content string, userID int) (int, error)
+	CreatePost(title string, content string, userID int, imageURL string) (int, error)
 	GetPostId(id int) (*models.Post, error)
 	GetUserPosts(userID int) ([]models.Post, error)
 	GetAllPosts() ([]models.Post, error)
@@ -26,7 +32,7 @@ type PostRepo interface {
 	GetLikedPosts(userID int) ([]models.Post, error)
 	GetUserReaction(userID, postID int) (int, error)
 	RemoveReaction(userID, postID int) error
-	AddComment(postId, userId int, content string) error
+	AddComment(postId, userId int, content string, imageURL string) error
 	GetCommentByPostId(postId int) ([]models.Comment, error)
 	LikeComment(userID, commentID int) error
 	DislikeComment(userID, commentID int) error

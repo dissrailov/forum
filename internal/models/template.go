@@ -12,4 +12,5 @@ type TemplateData struct {
 	User               *User
 	LikedPosts         *[]Post
 	UserPosts          *[]Post
+	AIResponse         *AIResponse
 }

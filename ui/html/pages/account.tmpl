@@ -1,60 +1,84 @@
 {{define "title"}}Your Account{{end}}
 
 {{define "main"}}
-<div class="account-container">
-    <h2>Your Account</h2>
-    
+<div class="max-w-3xl mx-auto">
     {{with .User}}
-    <table class="account-info-table">
-        <tr>
-            <th>Name</th>
-            <td>{{.Name}}</td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>{{.Email}}</td>
-        </tr>
-        <tr>
-            <th>Joined</th>
-            <td>{{humanDate .Created}}</td>
-        </tr>
-        <tr>
-            <th>Password</th>
-            <td><a href="/account/password" class="password-link">Change password</a></td>
-        </tr>
-    </table>
+    <!-- Profile card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 bg-gradient-to-br from-emerald-400 to-blue-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">
+                {{firstRune .Name}}
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-gray-900">{{.Name}}</h1>
+                <p class="text-gray-500 text-sm">{{.Email}}</p>
+                <p class="text-gray-400 text-xs mt-1">Joined {{humanDate .Created}}</p>
+            </div>
+            <a href="/account/password" class="ml-auto text-sm text-emerald-600 hover:text-emerald-700 font-medium">Change Password</a>
+        </div>
+    </div>
     {{end}}
 
-    <h3 class="toggle-heading" onclick="toggleSection('created-posts')">Created Posts</h3>
-<ul id="created-posts" class="toggle-section post-list">
-    {{if .UserPosts}}
-        {{range .UserPosts}}
-        <li class="user-post">
-            <div class="post-info">
-                <span class="post-title"><a href="/post/view?id={{.ID}}">{{.Title}}</a></span>
-                <span class="post-date">{{humanDate .Created}}</span>
-            </div>
-        </li>
-        {{end}}
-    {{else}}
-        <li class="no-posts">No posts created yet.</li>
-    {{end}}
-</ul>
+    <!-- Tabs -->
+    <div x-data="{ tab: 'posts' }">
+        <div class="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6">
+            <button @click="tab = 'posts'"
+                :class="tab === 'posts' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+                class="flex-1 py-2 text-sm font-medium rounded-lg transition">
+                My Posts
+            </button>
+            <button @click="tab = 'liked'"
+                :class="tab === 'liked' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+                class="flex-1 py-2 text-sm font-medium rounded-lg transition">
+                Liked Posts
+            </button>
+        </div>
 
-<h3 class="toggle-heading" onclick="toggleSection('liked-posts')">Liked Posts</h3>
-<ul id="liked-posts" class="toggle-section post-list">
-    {{if .LikedPosts}}
-        {{range .LikedPosts}}
-        <li class="user-post">
-            <div class="post-info">
-                <span class="post-title"><a href="/post/view?id={{.ID}}">{{.Title}}</a></span>
-                <span class="post-date">{{humanDate .Created}}</span>
+        <!-- My Posts -->
+        <div x-show="tab === 'posts'" x-transition>
+            {{if .UserPosts}}
+            <div class="space-y-3">
+                {{range .UserPosts}}
+                <a href="/post/view?id={{.ID}}" class="block bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-semibold text-gray-800">{{.Title}}</h3>
+                        <span class="text-xs text-gray-400">{{humanDate .Created}}</span>
+                    </div>
+                    <p class="text-gray-500 text-xs mt-1 line-clamp-1">{{.Content}}</p>
+                    <div class="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                        <span>{{.Likes}} likes</span>
+                        <span>{{.Dislikes}} dislikes</span>
+                    </div>
+                </a>
+                {{end}}
             </div>
-        </li>
-        {{end}}
-    {{else}}
-        <li class="no-posts">No posts liked yet.</li>
-    {{end}}
-</ul>
+            {{else}}
+            <div class="bg-white rounded-xl border border-gray-100 p-8 text-center">
+                <p class="text-gray-400 text-sm">You haven't created any posts yet.</p>
+            </div>
+            {{end}}
+        </div>
+
+        <!-- Liked Posts -->
+        <div x-show="tab === 'liked'" x-cloak x-transition>
+            {{if .LikedPosts}}
+            <div class="space-y-3">
+                {{range .LikedPosts}}
+                <a href="/post/view?id={{.ID}}" class="block bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-semibold text-gray-800">{{.Title}}</h3>
+                        <span class="text-xs text-gray-400">{{humanDate .Created}}</span>
+                    </div>
+                    <p class="text-gray-500 text-xs mt-1 line-clamp-1">{{.Content}}</p>
+                </a>
+                {{end}}
+            </div>
+            {{else}}
+            <div class="bg-white rounded-xl border border-gray-100 p-8 text-center">
+                <p class="text-gray-400 text-sm">You haven't liked any posts yet.</p>
+            </div>
+            {{end}}
+        </div>
+    </div>
 </div>
 {{end}}

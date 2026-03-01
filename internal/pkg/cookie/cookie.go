@@ -20,8 +20,8 @@ func SetSessionCookie(name string, w http.ResponseWriter, token string, exptime 
 		Path:     "/",
 		Expires:  exptime,
 		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode,
 	}
 	http.SetCookie(w, &cookie)
 }
@@ -32,8 +32,8 @@ func ExpireSessionCookie(name string, w http.ResponseWriter) {
 		Value:    "",
 		Path:     "/",
 		MaxAge:   -1,
-		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode,
 	}
 	http.SetCookie(w, &cookie)
 }

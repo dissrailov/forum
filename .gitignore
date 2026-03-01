@@ -1,1 +1,6 @@
 .idea
+.env
+frontend/node_modules/
+frontend/dist/
+data/database.db
+uploads/

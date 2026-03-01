@@ -2,6 +2,7 @@ package service
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"forum/internal/models"
 	"forum/internal/pkg/validator"
@@ -27,7 +28,7 @@ func (s *service) CreatePost(cookie string, form models.PostCreateForm, data *mo
 	title := strings.TrimSpace(form.Title)
 	content := strings.TrimSpace(form.Content)
 
-	postID, err := s.repo.CreatePost(title, content, userID)
+	postID, err := s.repo.CreatePost(title, content, userID, form.ImageURL)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -114,7 +115,7 @@ func (s *service) AddComment(data *models.TemplateData, form models.CommentForm,
 	}
 
 	data.Form = form
-	err := s.repo.AddComment(postID, userId, content)
+	err := s.repo.AddComment(postID, userId, content, form.ImageURL)
 	return data, err
 }
 
@@ -181,4 +182,21 @@ func (s *service) LikeComment(userID, commentID int) error {
 		}
 	}
 	return nil
+}
+
+func (s *service) GetAIResponse(postID int) (*models.AIResponse, error) {
+	resp, err := s.repo.GetAIResponseByPostID(postID)
+	if err != nil {
+		return nil, err
+	}
+	if resp == nil {
+		return nil, nil
+	}
+	if resp.SimilarPostsJSON != "" && resp.SimilarPostsJSON != "[]" {
+		var similar []models.SimilarPost
+		if jsonErr := json.Unmarshal([]byte(resp.SimilarPostsJSON), &similar); jsonErr == nil {
+			resp.SimilarPosts = similar
+		}
+	}
+	return resp, nil
 }

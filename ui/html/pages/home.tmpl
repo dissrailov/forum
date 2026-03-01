@@ -1,50 +1,82 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
-<div class="content-wrapper">
-    <div class="categories-container">
-    <h2>Categories</h2>
-    <div class="categories">
-        {{range .Categories}}
-            <form method="get" action="/">
-                <button type="submit" name="category" value="{{.ID}}" 
-                class="{{if eq .ID $.SelectedCategoryID}}selected{{end}}">{{.Name}}</button>
-            </form>
-        {{end}}
-        <a href='/'>Clear</a>
-    </div>
-    </div>
+<!-- Hero -->
+<div class="mb-8 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-2xl p-8 text-white shadow-lg">
+    <h1 class="text-3xl font-bold mb-2">Welcome to FitTalk</h1>
+    <p class="text-white/80 text-lg">Your AI-powered fitness and health community. Ask questions, share knowledge, get smart answers.</p>
+</div>
 
+<div class="flex flex-col lg:flex-row gap-8">
+    <!-- Sidebar: Categories -->
+    <aside class="lg:w-64 shrink-0">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sticky top-8">
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Categories</h2>
+            <div class="flex flex-wrap lg:flex-col gap-2">
+                <a href="/" class="px-3 py-1.5 rounded-lg text-sm font-medium transition
+                    {{if eq .SelectedCategoryID 0}}bg-emerald-100 text-emerald-700{{else}}text-gray-600 hover:bg-gray-100{{end}}">
+                    All Posts
+                </a>
+                {{if .Categories}}
+                {{range .Categories}}
+                    <a href="/?category={{.ID}}" class="px-3 py-1.5 rounded-lg text-sm font-medium transition
+                        {{if eq .ID $.SelectedCategoryID}}bg-emerald-100 text-emerald-700{{else}}text-gray-600 hover:bg-gray-100{{end}}">
+                        {{.Name}}
+                    </a>
+                {{end}}
+                {{end}}
+            </div>
+        </div>
+    </aside>
 
-    {{if .Posts}}
-    <div class="post-list-container">
-    <h2>Latest Posts</h2>
-        <div class="post-list">
-            {{range .Posts}}
-                <div class="post">
-                    <h3><a href="/post/view?id={{.ID}}">{{.Title}}</a></h3>
-                    <p>{{.Content}}</p>
-                    <div class="metadata">
-                        <span>Created: {{humanDate .Created}}</span>
-                        <div class="likes-dislikes">
-                            <form action="/post/like" method="post" class="like-form">
-                                <input type="hidden" name="postID" value="{{.ID}}">
-                                <button type="submit" class="like-button">Like</button>
-                                <span class="like-count">{{.Likes}}</span>
-                            </form>
-                            <form action="/post/dislike" method="post" class="dislike-form">
-                                <input type="hidden" name="postID" value="{{.ID}}">
-                                <button type="submit" class="dislike-button">Dislike</button>
-                                <span class="dislike-count">{{.Dislikes}}</span>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+    <!-- Posts list -->
+    <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">Latest Posts</h2>
+            {{if .IsAuthenticated}}
+            <a href="/post/create" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                New Post
+            </a>
             {{end}}
         </div>
+
+        {{if .Posts}}
+        <div class="space-y-4">
+            {{range .Posts}}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition">
+                <a href="/post/view?id={{.ID}}" class="block">
+                    <h3 class="text-lg font-semibold text-gray-800 hover:text-emerald-600 transition mb-1">{{.Title}}</h3>
+                    <p class="text-gray-500 text-sm line-clamp-2 mb-3">{{.Content}}</p>
+                </a>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-400">{{humanDate .Created}}</span>
+                    <div class="flex items-center gap-3">
+                        <form action="/post/like" method="post" class="inline">
+                            <input type="hidden" name="postID" value="{{.ID}}">
+                            <button type="submit" class="flex items-center gap-1 text-gray-400 hover:text-emerald-600 transition text-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H6a2 2 0 01-2-2v-7a2 2 0 012-2h2.5L12 3l2 7z"/></svg>
+                                {{.Likes}}
+                            </button>
+                        </form>
+                        <form action="/post/dislike" method="post" class="inline">
+                            <input type="hidden" name="postID" value="{{.ID}}">
+                            <button type="submit" class="flex items-center gap-1 text-gray-400 hover:text-red-500 transition text-sm">
+                                <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H6a2 2 0 01-2-2v-7a2 2 0 012-2h2.5L12 3l2 7z"/></svg>
+                                {{.Dislikes}}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </div>
+        {{else}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+            <p class="text-gray-500 text-lg">No posts yet. Be the first to share!</p>
+        </div>
+        {{end}}
     </div>
-    {{else}}
-        <p class="empty-message">There's nothing to see here... yet!</p>
-    {{end}}
 </div>
 {{end}}

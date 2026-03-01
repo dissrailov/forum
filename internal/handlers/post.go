@@ -64,6 +64,11 @@ func (h *HandlerApp) postCreatePost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	if h.aiService != nil {
+		go h.aiService.GenerateAndStore(id, form.Title, form.Content, form.ImageURL)
+	}
+
 	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", id), http.StatusSeeOther)
 }
 
@@ -308,4 +313,25 @@ func (h *HandlerApp) DislikeComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", postID), http.StatusSeeOther)
+}
+
+func (h *HandlerApp) AIResponseHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil || id < 1 {
+		h.NotFound(w)
+		return
+	}
+
+	aiResp, err := h.service.GetAIResponse(id)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	data := &models.TemplateData{
+		Post:       &models.Post{ID: id},
+		AIResponse: aiResp,
+	}
+
+	h.RenderFragment(w, http.StatusOK, "ai_response.tmpl", data)
 }

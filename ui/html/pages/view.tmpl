@@ -1,79 +1,137 @@
-{{define "title"}}Post #{{.Post.ID}}{{end}}
+{{define "title"}}{{.Post.Title}}{{end}}
 
 {{define "main"}}
-    {{with .Post}}
-    <div class='snippet'>
-        <div class='metadata'>
-            <strong>{{.Title}}</strong>
+{{with .Post}}
+<div class="max-w-4xl mx-auto">
+    <!-- Post card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+        <!-- Author row -->
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                {{firstRune .UserName}}
+            </div>
+            <div>
+                <p class="text-sm font-semibold text-gray-800">{{.UserName}}</p>
+                <p class="text-xs text-gray-400">{{humanDate .Created}}</p>
+            </div>
         </div>
-        <pre><code>{{.Content}}</code></pre>
-        <div class='metadata'>
-            Author: {{.UserName}}
-        </div>
-        <div class='metadata'>
-            <time>Created: {{humanDate .Created}}</time>
-        </div>
-        <div class='metadata'>
-            Categories: 
-            {{if .Categories}}
-                {{range .Categories}}
-                    <span>{{.Name}}</span>
-                {{end}}
-            {{else}}
-                <span>No categories</span>
+
+        <h1 class="text-2xl font-bold text-gray-900 mb-3">{{.Title}}</h1>
+
+        <!-- Categories -->
+        {{if .Categories}}
+        <div class="flex flex-wrap gap-2 mb-4">
+            {{range .Categories}}
+            <span class="bg-emerald-50 text-emerald-700 text-xs font-medium px-2.5 py-0.5 rounded-full">{{.Name}}</span>
             {{end}}
         </div>
-        <div class="likes-dislikes">
-            <form action="/post/like" method="post" class="like-form">
+        {{end}}
+
+        <div class="text-gray-700 leading-relaxed whitespace-pre-wrap mb-4">{{.Content}}</div>
+
+        <!-- Like/Dislike -->
+        <div class="flex items-center gap-4 pt-4 border-t border-gray-100">
+            <form action="/post/like" method="post">
                 <input type="hidden" name="postID" value="{{.ID}}">
                 <input type="hidden" name="fromPostView" value="true">
-                <button type="submit" class="like-button">Like</button>
-                <span class="like-count">{{.Likes}}</span>
+                <button type="submit" class="flex items-center gap-1.5 text-gray-500 hover:text-emerald-600 transition text-sm font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H6a2 2 0 01-2-2v-7a2 2 0 012-2h2.5L12 3l2 7z"/></svg>
+                    {{.Likes}}
+                </button>
             </form>
-            <form action="/post/dislike" method="post" class="dislike-form">
+            <form action="/post/dislike" method="post">
                 <input type="hidden" name="postID" value="{{.ID}}">
                 <input type="hidden" name="fromPostView" value="true">
-                <button type="submit" class="dislike-button">Dislike</button>
-                <span class="dislike-count">{{.Dislikes}}</span>
+                <button type="submit" class="flex items-center gap-1.5 text-gray-500 hover:text-red-500 transition text-sm font-medium">
+                    <svg class="w-5 h-5 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H6a2 2 0 01-2-2v-7a2 2 0 012-2h2.5L12 3l2 7z"/></svg>
+                    {{.Dislikes}}
+                </button>
             </form>
         </div>
     </div>
-    {{end}}
 
-    <h2>Comments</h2>
-    {{if .Comments}}
-        {{range .Comments}}
-        <div class="comment">
-            <pre><code>{{.Content}}</code></pre>
-            <small>Posted by user {{.Username}} at {{humanDate .Created}}</small>
-            <div class="likes-dislikes">
-                <form action="/post/comment/like" method="post" class="like-form">
-                    <input type="hidden" name="commentID" value="{{.ID}}">
-                    <input type="hidden" name="postID" value="{{.PostId}}">
-                    <button type="submit" class="like-button">Like</button>
-                    <span class="like-count">{{.Likes}}</span>
-                </form>
-                <form action="/post/comment/dislike" method="post" class="dislike-form">
-                    <input type="hidden" name="commentID" value="{{.ID}}">
-                    <input type="hidden" name="postID" value="{{.PostId}}">
-                    <button type="submit" class="dislike-button">Dislike</button>
-                    <span class="dislike-count">{{.Dislikes}}</span>
-                </form>
+    <!-- AI Response section -->
+    <div class="mb-6">
+        <div hx-get="/post/ai-response?id={{.ID}}" hx-trigger="load" hx-swap="innerHTML"
+             class="bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl p-1">
+            <div class="bg-white rounded-xl p-6">
+                <div class="flex items-center gap-3">
+                    <div class="animate-spin w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full"></div>
+                    <span class="text-gray-500 text-sm">FitTalk AI is thinking...</span>
+                </div>
             </div>
         </div>
-        {{end}}
-    {{else}}
-        <p>No comments yet.</p>
-    {{end}}
+    </div>
+{{end}}
 
-    <h3>Add a Comment</h3>
-    <form action="/post/comment" method="post">
-        <input type="hidden" name="PostId" value="{{.Post.ID}}">
-        <label>Content:</label>
-        {{with .Form.FieldErrors.Content}}
-            <label class='error'>{{.}}</label>
+    <!-- Comments -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+            Comments
+            {{if .Comments}}
+                <span class="text-sm font-normal text-gray-400">({{len $.Comments}})</span>
+            {{end}}
+        </h2>
+
+        {{if .Comments}}
+        <div class="space-y-4 mb-6">
+            {{range .Comments}}
+            <div class="flex gap-3">
+                <div class="w-8 h-8 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0">
+                    {{firstRune .Username}}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-sm font-semibold text-gray-800">{{.Username}}</span>
+                        <span class="text-xs text-gray-400">{{humanDate .Created}}</span>
+                    </div>
+                    <p class="text-gray-700 text-sm whitespace-pre-wrap">{{.Content}}</p>
+                    <div class="flex items-center gap-3 mt-2">
+                        <form action="/post/comment/like" method="post" class="inline">
+                            <input type="hidden" name="commentID" value="{{.ID}}">
+                            <input type="hidden" name="postID" value="{{.PostId}}">
+                            <button type="submit" class="flex items-center gap-1 text-gray-400 hover:text-emerald-600 transition text-xs">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H6a2 2 0 01-2-2v-7a2 2 0 012-2h2.5L12 3l2 7z"/></svg>
+                                {{.Likes}}
+                            </button>
+                        </form>
+                        <form action="/post/comment/dislike" method="post" class="inline">
+                            <input type="hidden" name="commentID" value="{{.ID}}">
+                            <input type="hidden" name="postID" value="{{.PostId}}">
+                            <button type="submit" class="flex items-center gap-1 text-gray-400 hover:text-red-500 transition text-xs">
+                                <svg class="w-3.5 h-3.5 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H6a2 2 0 01-2-2v-7a2 2 0 012-2h2.5L12 3l2 7z"/></svg>
+                                {{.Dislikes}}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </div>
+        {{else}}
+        <p class="text-gray-400 text-sm mb-6">No comments yet. Be the first!</p>
         {{end}}
-        <textarea name='content'>{{.Form.Content}}</textarea>
-        <button type="submit">Add Comment</button>
-    </form>
+
+        <!-- Add comment form -->
+        <div class="border-t border-gray-100 pt-4" x-data="{ chars: 0 }">
+            <h3 class="text-sm font-semibold text-gray-700 mb-3">Add a Comment</h3>
+            <form action="/post/comment" method="post">
+                <input type="hidden" name="PostId" value="{{.Post.ID}}">
+                {{with .Form.FieldErrors.Content}}
+                    <p class="text-red-500 text-sm mb-2">{{.}}</p>
+                {{end}}
+                <textarea name="content" rows="3"
+                    x-on:input="chars = $el.value.length"
+                    class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none transition"
+                    placeholder="Share your thoughts...">{{.Form.Content}}</textarea>
+                <div class="flex items-center justify-between mt-2">
+                    <span class="text-xs" :class="chars > 100 ? 'text-red-500' : 'text-gray-400'" x-text="chars + '/100'"></span>
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition">
+                        Post Comment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {{end}}

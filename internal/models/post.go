@@ -12,6 +12,7 @@ type Post struct {
 	Title      string
 	Categories []Category
 	Content    string
+	ImageURL   string
 	Likes      int
 	Dislikes   int
 	Created    time.Time
@@ -21,16 +22,18 @@ type Post struct {
 type PostCreateForm struct {
 	Title               string
 	Content             string
+	ImageURL            string
 	CategoryIDs         []int
 	Category            []string
 	validator.Validator `form:"-"`
 }
 
 type CommentForm struct {
-	PostID  int
-	UserID  int
-	Content string
-	Token   string
+	PostID   int
+	UserID   int
+	Content  string
+	ImageURL string
+	Token    string
 	validator.Validator
 }
 
@@ -40,6 +43,7 @@ type Comment struct {
 	UserId   int
 	Username string
 	Content  string
+	ImageURL string
 	Created  time.Time
 	Likes    int
 	Dislikes int

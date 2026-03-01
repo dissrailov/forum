@@ -1,8 +1,8 @@
 package app
 
 import (
+	"html/template"
 	"log"
-	"text/template"
 )
 
 type Application struct {

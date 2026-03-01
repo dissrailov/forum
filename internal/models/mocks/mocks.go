@@ -15,7 +15,7 @@ func (r *MockRepo) AddCategory(postID int, categoryIDs []int) error {
 	return nil
 }
 
-func (r *MockRepo) AddComment(postID, userID int, content string) error {
+func (r *MockRepo) AddComment(postID, userID int, content string, imageURL string) error {
 	return nil
 }
 
@@ -30,7 +30,7 @@ func (r *MockRepo) CreateCategory(names []string) error {
 	return nil
 }
 
-func (r *MockRepo) CreatePost(title, content string, userID int) (int, error) {
+func (r *MockRepo) CreatePost(title, content string, userID int, imageURL string) (int, error) {
 	return userID, nil
 }
 
@@ -131,4 +131,12 @@ func (r *MockRepo) RemoveReaction(id, postid int) error {
 
 func (r *MockRepo) UpdatePassword(id int, newPassword string) error {
 	return nil
+}
+
+func (r *MockRepo) CreateAIResponse(postID int, content string, similarPostsJSON string) error {
+	return nil
+}
+
+func (r *MockRepo) GetAIResponseByPostID(postID int) (*models.AIResponse, error) {
+	return nil, nil
 }

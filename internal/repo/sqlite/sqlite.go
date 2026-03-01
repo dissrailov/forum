@@ -78,6 +78,14 @@ func NewDB(dsn string) (*Sqlite, error) {
 		FOREIGN KEY (post_id) REFERENCES posts(id),
 		FOREIGN KEY (category_id) REFERENCES category(id)
 	);`,
+		`CREATE TABLE IF NOT EXISTS ai_responses (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		post_id INTEGER UNIQUE NOT NULL,
+		content TEXT NOT NULL,
+		similar_posts TEXT DEFAULT '[]',
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (post_id) REFERENCES posts(id)
+	);`,
 	}
 	for _, query := range queries {
 		stmt, err := db.Prepare(query)
@@ -90,5 +98,34 @@ func NewDB(dsn string) (*Sqlite, error) {
 		}
 		stmt.Close()
 	}
+
+	// Migrations: add image_url columns (safe to re-run)
+	migrations := []string{
+		"ALTER TABLE posts ADD COLUMN image_url TEXT DEFAULT ''",
+		"ALTER TABLE comments ADD COLUMN image_url TEXT DEFAULT ''",
+	}
+	for _, m := range migrations {
+		db.Exec(m) // ignore "duplicate column" errors
+	}
+
+	// Seed fitness categories if empty
+	var count int
+	err = db.QueryRow("SELECT COUNT(*) FROM category").Scan(&count)
+	if err != nil {
+		return nil, fmt.Errorf("sqlite.NewDB: %w", err)
+	}
+	if count == 0 {
+		categories := []string{
+			"Тренировки", "Питание", "Здоровье",
+			"Восстановление", "Мотивация", "Вопросы новичков",
+		}
+		for _, name := range categories {
+			_, err := db.Exec("INSERT INTO category (name) VALUES (?)", name)
+			if err != nil {
+				return nil, fmt.Errorf("sqlite.NewDB seed: %w", err)
+			}
+		}
+	}
+
 	return &Sqlite{DB: db}, nil
 }

@@ -5,26 +5,36 @@ import (
 )
 
 func (h *HandlerApp) Routes() http.Handler {
-	fileServer := http.FileServer(http.Dir("./ui/static"))
 	mux := http.NewServeMux()
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
-	mux.HandleFunc("/", h.Home)
-	//post
-	mux.HandleFunc("/post/view", h.postView)
-	mux.HandleFunc("/post/like", h.RequireAuth(h.LikePost))
-	mux.HandleFunc("/post/dislike", h.RequireAuth(h.DislikePost))
-	mux.HandleFunc("/post/create", h.RequireAuth(h.postCreate))
-	mux.HandleFunc("/post/comment", h.RequireAuth(h.AddComment))
-	mux.HandleFunc("/post/comment/like", h.RequireAuth(h.LikeComment))
-	mux.HandleFunc("/post/comment/dislike", h.RequireAuth(h.DislikeComment))
 
-	// users
-	mux.HandleFunc("/user/signup", h.UserSignup)
-	mux.HandleFunc("/user/login", h.userLogin)
-	mux.HandleFunc("/user/logout", h.userLogoutPost)
-	//account
-	mux.HandleFunc("/account/view", h.RequireAuth(h.AccountView))
-	mux.HandleFunc("/account/password", h.RequireAuth(h.AccountChangePassword))
+	// API routes
+	mux.HandleFunc("/api/posts", h.apiGetPosts)
+	mux.HandleFunc("/api/posts/view", h.apiGetPost)
+	mux.HandleFunc("/api/posts/create", h.RequireAuthAPI(h.apiCreatePost))
+	mux.HandleFunc("/api/posts/like", h.RequireAuthAPI(h.apiLikePost))
+	mux.HandleFunc("/api/posts/dislike", h.RequireAuthAPI(h.apiDislikePost))
+	mux.HandleFunc("/api/posts/ai", h.apiGetAIResponse)
+	mux.HandleFunc("/api/posts/comments", h.apiAddComment)
+	mux.HandleFunc("/api/comments/like", h.RequireAuthAPI(h.apiLikeComment))
+	mux.HandleFunc("/api/comments/dislike", h.RequireAuthAPI(h.apiDislikeComment))
+	mux.HandleFunc("/api/categories", h.apiGetCategories)
+	mux.HandleFunc("/api/auth/me", h.apiGetMe)
+	mux.HandleFunc("/api/auth/login", h.apiLogin)
+	mux.HandleFunc("/api/auth/signup", h.apiSignup)
+	mux.HandleFunc("/api/auth/logout", h.apiLogout)
+	mux.HandleFunc("/api/account", h.RequireAuthAPI(h.apiGetAccount))
+	mux.HandleFunc("/api/account/password", h.RequireAuthAPI(h.apiChangePassword))
 
-	return h.recoverPanic(h.Logrequest(SecureHeaders(mux)))
+	// Static images
+	imgServer := http.FileServer(http.Dir("./ui/static"))
+	mux.Handle("/static/", http.StripPrefix("/static", imgServer))
+
+	// Uploaded images
+	uploads := http.FileServer(http.Dir("./uploads"))
+	mux.Handle("/uploads/", http.StripPrefix("/uploads", uploads))
+
+	// SPA catch-all — serves frontend/dist
+	mux.HandleFunc("/", h.spaHandler("./frontend/dist"))
+
+	return h.recoverPanic(h.Logrequest(h.CORS(mux)))
 }

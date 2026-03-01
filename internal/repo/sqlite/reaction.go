@@ -57,10 +57,10 @@ func (s *Sqlite) RemoveReaction(userID, postID int) error {
 func (s *Sqlite) GetLikedPosts(userID int) ([]models.Post, error) {
 	op := "sqlite.GetLikedPosts"
 	query := `
-        SELECT p.id, p.title, p.content, p.created
+        SELECT p.id, p.title, p.content, p.image_url, p.created
         FROM posts p
         JOIN user_post_reactions upr ON p.id = upr.post_id
-        WHERE upr.user_id = ? AND upr.reaction = 1` // Предполагаем, что 1 - это лайк
+        WHERE upr.user_id = ? AND upr.reaction = 1`
 
 	rows, err := s.DB.Query(query, userID)
 	if err != nil {
@@ -71,7 +71,7 @@ func (s *Sqlite) GetLikedPosts(userID int) ([]models.Post, error) {
 	var posts []models.Post
 	for rows.Next() {
 		var post models.Post
-		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.Created); err != nil {
+		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.ImageURL, &post.Created); err != nil {
 			return nil, fmt.Errorf("%s : %w", op, err)
 		}
 		posts = append(posts, post)
