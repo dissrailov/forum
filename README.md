@@ -37,7 +37,7 @@ The objective of this project is to create a web forum that facilitates communic
 - Posts and comments are visible to all users.
 - Non-registered users can view posts and comments but cannot interact.
 
-## Likes and Dislikes
+## Likes and Dislike
 
 - Only registered users can like or dislike posts and comments.
 - The number of likes and dislikes is visible to all users.
